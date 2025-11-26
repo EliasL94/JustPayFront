@@ -6,7 +6,7 @@ import Shortcuts from '../components/dashboard/Shortcuts';
 
 const Dashboard = () => {
     return (
-        <div className="self-stretch self-stretch px-6 py-12 inline-flex flex-col justify-start items-start gap-12">
+        <div className="self-stretch self-stretch px-6 py-12 inline-flex flex-col justify-start items-start gap-12 bg-slate-50 min-h-screen">
             <DashboardHeader />
             <AccountCards />
             <CashFlowChart />

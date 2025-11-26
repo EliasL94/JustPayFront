@@ -1,28 +1,16 @@
-import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/login';
 
-import './App.css'
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Ajoutez d'autres routes ici */}
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
-function App() {
-  const [message, setMessage] = useState('Chargement...');
-
-  useEffect(() => {
-    fetch('/users/bonjour')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        setMessage(data.message); 
-      })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des données:', error);
-        setMessage('Erreur de connexion à l\'API.');
-      });
-  }, []);
-
-  return <h1>Message de FastAPI: {message}</h1>;
-}
-
-export default App
+export default App;

@@ -1,16 +1,9 @@
 import { useState } from 'react';
+import logoFinvo from '../../assets/jira_ops.svg';
+import loginBackground from '../../assets/loginBackground.png';
+import './loginForm.css';
 
 const API_BASE_URL = '';
-
-const FinvoLogo = () => (
-  <div className="w-[89.63px] h-[89.63px] relative overflow-hidden flex justify-center items-center">
-    <img
-      src="src/assets/jira_ops.svg"
-      alt="Logo Finvo"
-      className="w-full h-full object-contain"
-    />
-  </div>
-);
 
 
 const LoginForm = () => {
@@ -63,35 +56,33 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-row bg-white font-sans">
+    <div className="login-container">
+      <div className="login-form-section">
+        <div className="login-form-wrapper">
 
-      <div className="w-1/2 flex justify-center items-center p-8 lg:p-16">
-
-        <div
-          className="w-[341.83px] flex flex-col justify-start items-start gap-6"
-          style={{
-            maxWidth: '100%',
-            minWidth: '341.83px'
-          }}
-        >
-
-          <div className="flex items-center gap-[11.95px] py-3">
-            <FinvoLogo />
-            <div className="text-[47.80px] font-semibold text-[#142F2C] uppercase leading-[76.48px] font-['PolySans_Qonto']">
+          <div className="login-logo-section">
+            <div className="w-[89.63px] h-[89.63px] relative overflow-hidden flex justify-center items-center">
+              <img
+                src={logoFinvo}
+                alt="Logo Finvo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="logo-title">
               Finvo
             </div>
           </div>
 
-          <div className="self-stretch flex flex-col justify-start items-start gap-4 py-4">
-            <h2 className="self-stretch text-2xl font-bold text-[#142F2C] leading-[33.60px]">
+          <div className="login-title-section">
+            <h2 className="login-title">
               Content de vous revoir !
             </h2>
-            <p className="self-stretch text-base font-semibold text-[#142F2C] leading-[22.40px]">
+            <p className="login-subtitle">
               Connectez vous à votre compte
             </p>
           </div>
 
-          <div className="self-stretch border-t border-[#142F2C]/50 my-2"></div>
+          <div className="login-divider"></div>
 
           {statusMessage && (
             <div className={`w-full p-3 rounded-lg text-sm font-medium ${isError ? 'bg-red-100 text-red-700' : 'bg-[#58C5C3]/10 text-[#142F2C]'}`}>
@@ -99,11 +90,10 @@ const LoginForm = () => {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="w-full flex flex-col gap-6">
+          <form onSubmit={handleLogin} className="login-form">
 
-            {/* Champ Email */}
-            <div className="w-full flex flex-col justify-end items-start gap-[6.71px] py-2">
-              <label htmlFor="email" className="block text-[11.75px] font-semibold text-[#2D3648] leading-[13.42px] uppercase">
+            <div className="form-field">
+              <label htmlFor="email" className="form-label">
                 Email
               </label>
               <input
@@ -112,14 +102,13 @@ const LoginForm = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full h-[40.27px] px-4 py-3 border border-[#CBD2E0] rounded-[5.03px] outline-none focus:ring-1 focus:ring-[#58C5C3]"
+                className="form-input"
                 placeholder="votre.email@exemple.com"
               />
             </div>
 
-            {/* Champ Mot de passe */}
-            <div className="w-full flex flex-col justify-end items-start gap-[6.71px] py-2">
-              <label htmlFor="password" className="block text-[11.75px] font-semibold text-[#2D3648] leading-[13.42px] uppercase">
+            <div className="form-field">
+              <label htmlFor="password" className="form-label">
                 Mot de passe
               </label>
               <input
@@ -128,17 +117,16 @@ const LoginForm = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full h-[40.27px] px-4 py-3 border border-[#CBD2E0] rounded-[5.03px] outline-none focus:ring-1 focus:ring-[#58C5C3]"
+                className="form-input"
                 placeholder="********"
               />
             </div>
 
-            {/* Bouton Se connecter + Mot de passe oublié */}
-            <div className="inline-flex justify-start items-center gap-[20.63px] pt-4 py-3">
+            <div className="form-actions">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-[114.43px] px-[17.47px] py-[11.65px] bg-[#58C5C3] hover:bg-[#459998] text-[#142F2C] font-bold text-[13.10px] rounded-[4.37px] shadow-md transition disabled:opacity-50 flex justify-center items-center leading-[17.47px]"
+                className="submit-button"
               >
                 {loading ? (
                   <svg className="animate-spin h-5 w-5 text-[#142F2C]" viewBox="0 0 24 24" fill="none">
@@ -149,20 +137,19 @@ const LoginForm = () => {
                   'Se connecter'
                 )}
               </button>
-              <a href="#" className="text-center text-[#A0ABC0] text-[7.86px] font-normal leading-[11.79px] hover:underline">
+              <a href="#" className="forgot-password-link">
                 Mot de passe oublié ?
               </a>
             </div>
           </form>
 
-          <div className="self-stretch border-t border-[#142F2C]/50 my-2"></div>
+          <div className="login-divider"></div>
 
-          {/* Lien d'inscription */}
-          <div className="w-[231.32px] inline-flex justify-start items-center gap-[20.63px] text-[7.86px] leading-[11.79px] py-3">
-            <span className="text-center text-[#A0ABC0] font-normal">
+          <div className="signup-section">
+            <span className="signup-text">
               Pas encore de compte ?
             </span>
-            <a href="#" className="text-center text-[#3F9392] font-normal hover:underline">
+            <a href="#" className="signup-link">
               Ouvrez un compte
             </a>
           </div>
@@ -171,22 +158,13 @@ const LoginForm = () => {
       </div>
 
       <div
-        data-layer="Frame 14"
-        className="w-1/2 flex relative overflow-hidden min-h-screen"
+        className="login-image-section"
       >
         <img
-          src="/src/assets/loginBackground.png"
+          src={loginBackground}
           alt="Décoration Financière"
-          className="w-full h-full object-cover"
+          className="login-background-image"
         />
-
-        <div
-          className="absolute inset-0 pointer-events-none z-10"
-          style={{
-            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #459998 100%)',
-            opacity: 0.9
-          }}
-        ></div>
       </div>
     </div>
   );

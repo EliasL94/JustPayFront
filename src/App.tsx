@@ -1,28 +1,20 @@
-import { useEffect, useState } from 'react'
-
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import './App.css';
 
 function App() {
-  const [message, setMessage] = useState('Chargement...');
-
-  useEffect(() => {
-    fetch('/users/bonjour')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        setMessage(data.message); 
-      })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des données:', error);
-        setMessage('Erreur de connexion à l\'API.');
-      });
-  }, []);
-
-  return <h1>Message de FastAPI: {message}</h1>;
+  return (
+    <Router>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

@@ -19,11 +19,11 @@ const Header = ({ onMenuClick }: HeaderProps) => {
                 </div>
                 <div className="flex justify-start items-center gap-1.5">
                     <img src={BrandIcon} alt="Profile" className="w-12 h-12 object-contain" />
-                    <div className="justify-start text-emerald-950 text-2xl font-semibold font-['PolySans_Qonto'] uppercase leading-10">Finvo</div>
+                    <div className="justify-start text-emerald-950 text-2xl font-bold font-['Inter'] uppercase leading-10">JustPay</div>
                 </div>
             </div>
             <div className="flex justify-start items-center gap-4">
-                <div data-icon="true" data-label="false" data-value="true" data-optional="false" className="w-72 inline-flex flex-col justify-end items-start gap-2">
+                <div data-icon="true" data-label="false" data-value="true" data-optional="false" className="hidden md:inline-flex w-72 flex-col justify-end items-start gap-2">
                     <div className="self-stretch h-12 relative bg-white rounded-md outline outline-2 outline-offset-[-2px] outline-slate-300 flex items-center px-3">
                         <div className="flex-1 text-emerald-950 text-base font-normal font-['Inter'] leading-6">Rechercher une transaction</div>
                         <img src={SearchIcon} alt="Search" className="w-6 h-6 object-contain" />

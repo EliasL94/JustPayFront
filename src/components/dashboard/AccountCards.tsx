@@ -4,7 +4,7 @@ import Flechebasverte from '../../assets/SVG_Dashboard/Icon-5.svg';
 
 const AccountCards = () => {
     return (
-        <div className="self-stretch inline-flex justify-start items-start gap-6">
+        <div className="w-full flex flex-col lg:flex-row justify-start items-start gap-6">
             <div className="flex-1 px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4 overflow-hidden">
                 <div className="inline-flex justify-start items-start gap-4">
                     <div className="w-12 h-12 p-2.5 bg-violet-100 rounded-[47px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">

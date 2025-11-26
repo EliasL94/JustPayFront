@@ -16,7 +16,7 @@ const Accounts = () => {
     ];
 
     return (
-        <div className="self-stretch self-stretch px-6 py-12 inline-flex flex-col justify-start items-start gap-12 bg-slate-50 min-h-screen relative">
+        <div className="self-stretch self-stretch px-4 md:px-6 py-12 inline-flex flex-col justify-start items-start gap-12 bg-slate-50 min-h-screen relative">
             <AccountsHeader onAddAccount={() => setIsModalOpen(true)} />
             {isModalOpen && <AddAccountModal onClose={() => setIsModalOpen(false)} />}
             {isCloseModalOpen && <CloseAccountModal onClose={() => setIsCloseModalOpen(false)} />}

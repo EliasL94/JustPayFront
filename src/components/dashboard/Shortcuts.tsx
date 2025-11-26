@@ -6,7 +6,7 @@ import IconPlus from '../../assets/SVG_Dashboard/icon-plus.svg';
 
 const Shortcuts = () => {
     return (
-        <div className="flex-1 px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4">
+        <div className="w-full lg:w-auto flex-1 px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4">
             <div className="self-stretch inline-flex justify-between items-center">
                 <div className="justify-start text-emerald-950 text-2xl font-bold font-['Inter'] leading-8">Raccourcis</div>
                 <div className="w-5 h-5 relative overflow-hidden flex justify-center items-center">

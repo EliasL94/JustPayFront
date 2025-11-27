@@ -98,7 +98,7 @@ const LoginForm = () => {
               />
             </div>
             <div className="logo-title">
-              Finvo
+              Justpay
             </div>
           </div>
 

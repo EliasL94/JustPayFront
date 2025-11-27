@@ -1,8 +1,96 @@
+import { useState, useEffect } from 'react';
+
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const TransactionsStats = () => {
+    const [income, setIncome] = useState<number>(0);
+    const [expenses, setExpenses] = useState<number>(0);
+    const [totalTransactions, setTotalTransactions] = useState<number>(0);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTransactionsStats = async () => {
+            const userId = localStorage.getItem('user_id');
+            if (!userId) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                let allTransactions: any[] = [];
+
+                const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`);
+                if (primaryResponse.ok) {
+                    const primaryData = await primaryResponse.json();
+                    if (primaryData?.account_number) {
+                        const txResponse = await fetch(`${API_BASE_URL}/payments/account/${primaryData.account_number}`);
+                        if (txResponse.ok) {
+                            const txData = await txResponse.json();
+                            if (Array.isArray(txData)) {
+                                allTransactions = [...allTransactions, ...txData];
+                            }
+                        }
+                    }
+                }
+
+                const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`);
+                if (secondaryResponse.ok) {
+                    const secondaryData = await secondaryResponse.json();
+                    let secondaryAccounts: any[] = [];
+
+                    if (Array.isArray(secondaryData)) {
+                        secondaryAccounts = secondaryData;
+                    } else if (secondaryData.accounts && Array.isArray(secondaryData.accounts)) {
+                        secondaryAccounts = secondaryData.accounts;
+                    }
+
+                    for (const account of secondaryAccounts) {
+                        if (account?.account_number) {
+                            const txResponse = await fetch(`${API_BASE_URL}/payments/account/${account.account_number}`);
+                            if (txResponse.ok) {
+                                const txData = await txResponse.json();
+                                if (Array.isArray(txData)) {
+                                    allTransactions = [...allTransactions, ...txData];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                let totalIncome = 0;
+                let totalExpenses = 0;
+
+                allTransactions.forEach(tx => {
+                    const amount = typeof tx.amount === 'string'
+                        ? parseFloat(tx.amount.replace(',', '.'))
+                        : tx.amount;
+
+                    if (amount > 0) {
+                        totalIncome += amount;
+                    } else {
+                        totalExpenses += Math.abs(amount);
+                    }
+                });
+
+                setIncome(totalIncome);
+                setExpenses(totalExpenses);
+                setTotalTransactions(allTransactions.length);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching transaction stats:', error);
+                setLoading(false);
+            }
+        };
+
+        fetchTransactionsStats();
+    }, []);
+
+    const formatAmount = (amount: number) => {
+        return amount.toFixed(2).replace('.', ',') + '€';
+    };
+
     return (
         <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex' }}>
-            {/* Entrées */}
             <div style={{ alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, background: 'white', overflow: 'hidden', borderRadius: 16, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex' }}>
                 <div style={{ width: 50, height: 50, padding: 10, background: '#B4E5E4', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -11,11 +99,12 @@ const TransactionsStats = () => {
                 </div>
                 <div style={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
                     <div style={{ color: '#002222', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>Entrées</div>
-                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>1234,56€</div>
+                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>
+                        {loading ? '...' : formatAmount(income)}
+                    </div>
                 </div>
             </div>
 
-            {/* Sorties */}
             <div style={{ alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, background: 'white', overflow: 'hidden', borderRadius: 16, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex' }}>
                 <div style={{ width: 50, height: 50, padding: 10, background: '#F6C4A9', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,11 +113,12 @@ const TransactionsStats = () => {
                 </div>
                 <div style={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
                     <div style={{ color: '#002222', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>Sorties</div>
-                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>168,24€</div>
+                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>
+                        {loading ? '...' : formatAmount(expenses)}
+                    </div>
                 </div>
             </div>
 
-            {/* Transactions */}
             <div style={{ alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, background: 'white', overflow: 'hidden', borderRadius: 16, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex' }}>
                 <div style={{ width: 50, height: 50, padding: 10, background: '#EEE7FE', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,7 +132,9 @@ const TransactionsStats = () => {
                 </div>
                 <div style={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
                     <div style={{ color: '#002222', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>Transactions</div>
-                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>26</div>
+                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>
+                        {loading ? '...' : totalTransactions}
+                    </div>
                 </div>
             </div>
         </div>

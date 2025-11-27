@@ -151,7 +151,7 @@ const signupForm = () => {
                             />
                         </div>
                         <div className="signup-logo-title">
-                            Finvo
+                            Justpay
                         </div>
                     </div>
 

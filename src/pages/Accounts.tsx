@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AccountsHeader from '../components/accounts/AccountsHeader';
 import AccountCard from '../components/accounts/AccountCard';
 import AddAccountModal from '../components/accounts/AddAccountModal';
@@ -12,7 +12,7 @@ const Accounts = () => {
     const [selectedAccountToClose, setSelectedAccountToClose] = useState<any>(null);
     const [userDetails, setUserDetails] = useState<any>(null);
 
-    const fetchAccounts = async () => {
+    const fetchAccounts = useCallback(async () => {
         const userId = localStorage.getItem('user_id');
         if (!userId) {
             console.warn('User ID missing');
@@ -72,9 +72,9 @@ const Accounts = () => {
         } catch (error) {
             console.error('Network error:', error);
         }
-    };
+    }, []);
 
-    const fetchUserDetails = async () => {
+    const fetchUserDetails = useCallback(async () => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
@@ -91,12 +91,12 @@ const Accounts = () => {
         } catch (error) {
             console.error('Error fetching user details:', error);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchAccounts();
         fetchUserDetails();
-    }, []);
+    }, [fetchAccounts, fetchUserDetails]);
 
     const handleDeleteAccount = async () => {
         if (!selectedAccountToClose || !selectedAccountToClose.account_number) return;

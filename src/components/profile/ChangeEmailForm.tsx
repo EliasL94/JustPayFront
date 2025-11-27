@@ -1,4 +1,8 @@
-const ChangeEmailForm = () => {
+interface ChangeEmailFormProps {
+    currentEmail?: string;
+}
+
+const ChangeEmailForm = ({ currentEmail }: ChangeEmailFormProps) => {
     return (
         <div className="w-80 p-6 bg-white inline-flex flex-col justify-start items-start gap-4 rounded-2xl border border-gray-100 shadow-sm">
             <div className="justify-start text-black text-xl font-bold font-['Inter'] leading-7">Changer d’email</div>
@@ -8,7 +12,12 @@ const ChangeEmailForm = () => {
                 <div className="self-stretch inline-flex justify-start items-start gap-2">
                     <div className="flex-1 justify-start text-gray-700 text-xs font-semibold font-['Inter'] leading-3">Email</div>
                 </div>
-                <input type="email" className="self-stretch h-10 px-3 bg-white rounded-[5.03px] outline outline-[1.68px] outline-offset-[-1.68px] outline-slate-300 focus:outline-emerald-500" />
+                <input
+                    type="email"
+                    defaultValue={currentEmail}
+                    placeholder={currentEmail || "votre@email.com"}
+                    className="self-stretch h-10 px-3 bg-white rounded-[5.03px] outline outline-[1.68px] outline-offset-[-1.68px] outline-slate-300 focus:outline-emerald-500"
+                />
             </div>
 
             <div className="inline-flex justify-start items-center gap-5 pt-2">

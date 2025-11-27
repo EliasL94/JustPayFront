@@ -2,49 +2,22 @@ import { useState, useEffect } from 'react';
 
 interface BeneficiaryCardProps {
     id: number;
+    name: string;
+    iban?: string;
+    account_number?: string;
     onDelete?: () => void;
 }
 
-const BeneficiaryCard = ({ id, onDelete }: BeneficiaryCardProps) => {
-    const [beneficiary, setBeneficiary] = useState<{ name: string; iban?: string; account_number?: string } | null>(null);
-
-    useEffect(() => {
-        const fetchBeneficiaryDetails = async () => {
-            try {
-                const response = await fetch(`http://127.0.0.1:8000/beneficiaries/${id}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Détails bénéficiaire:', data); // Debug log
-                    setBeneficiary(data);
-                } else {
-                    console.error('Erreur lors de la récupération des détails du bénéficiaire');
-                }
-            } catch (error) {
-                console.error('Erreur réseau:', error);
-            }
-        };
-
-        fetchBeneficiaryDetails();
-    }, [id]);
-
-    if (!beneficiary) {
-        return (
-            <div className="self-stretch p-6 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4 overflow-hidden border border-gray-100 shadow-sm animate-pulse">
-                <div className="h-7 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-            </div>
-        );
-    }
-
+const BeneficiaryCard = ({ id, name, iban, account_number, onDelete }: BeneficiaryCardProps) => {
     return (
         <div className="self-stretch p-6 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4 overflow-hidden border border-gray-100 shadow-sm">
             <div className="self-stretch inline-flex justify-start items-start gap-4">
-                <div className="w-full justify-start text-emerald-950 text-lg font-normal font-['Inter'] leading-7">{beneficiary.name}</div>
+                <div className="w-full justify-start text-emerald-950 text-lg font-normal font-['Inter'] leading-7">{name}</div>
             </div>
             <div className="self-stretch inline-flex justify-start items-center gap-2.5">
                 <div className="justify-start text-emerald-950 text-base font-semibold font-['Inter'] leading-6"> </div>
                 <div className="justify-start text-neutral-400 text-base font-normal font-['Inter'] leading-6">
-                    {beneficiary.iban || beneficiary.account_number}
+                    {iban || account_number}
                 </div>
             </div>
             <div className="inline-flex justify-start items-start gap-4">

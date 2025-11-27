@@ -1,73 +1,42 @@
-import { useState, useEffect } from 'react';
+interface TransactionsListProps {
+    transactions?: any[];
+    loading?: boolean;
+    accounts?: any[];
+    beneficiaries?: any[];
+}
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const TransactionsList = ({ transactions = [], loading = false, accounts = [], beneficiaries = [] }: TransactionsListProps) => {
 
-const TransactionsList = () => {
-    const [transactions, setTransactions] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const getTransactionName = (tx: any) => {
+        // If we have a direct beneficiary name, use it (unless it's "Inconnu" or empty)
+        if (tx.beneficiary && tx.beneficiary !== 'Inconnu') return tx.beneficiary;
 
-    useEffect(() => {
-        const fetchTransactions = async () => {
-            const userId = localStorage.getItem('user_id');
-            if (!userId) {
-                setLoading(false);
-                return;
-            }
+        // Determine the "other" account number
+        let otherAccountNumber = '';
+        if (tx.amount > 0) {
+            // Expense: Money went to beneficiary_account_number
+            otherAccountNumber = tx.beneficiary_account_number;
+        } else {
+            // Income: Money came from account_number
+            otherAccountNumber = tx.account_number;
+        }
 
-            try {
-                let allTransactions: any[] = [];
+        if (!otherAccountNumber) return tx.label || tx.description || 'Inconnu';
 
-                // Fetch primary account
-                const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`);
-                if (primaryResponse.ok) {
-                    const primaryData = await primaryResponse.json();
-                    if (primaryData?.account_number) {
-                        const txResponse = await fetch(`${API_BASE_URL}/payments/account/${primaryData.account_number}`);
-                        if (txResponse.ok) {
-                            const txData = await txResponse.json();
-                            if (Array.isArray(txData)) {
-                                allTransactions = [...allTransactions, ...txData];
-                            }
-                        }
-                    }
-                }
+        // 1. Check in Beneficiaries (External)
+        const beneficiary = beneficiaries.find(b => b.account_number === otherAccountNumber);
+        if (beneficiary) return beneficiary.name;
 
-                // Fetch secondary accounts
-                const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`);
-                if (secondaryResponse.ok) {
-                    const secondaryData = await secondaryResponse.json();
-                    let secondaryAccounts: any[] = [];
+        // 2. Check in My Accounts (Internal Transfer)
+        const account = accounts.find(a => a.account_number === otherAccountNumber);
+        if (account) {
+            // It's one of my accounts. Return its name or "Compte [Type]"
+            return account.name || (account.type === 'primary' ? 'Compte Principal' : 'Compte Secondaire');
+        }
 
-                    if (Array.isArray(secondaryData)) {
-                        secondaryAccounts = secondaryData;
-                    } else if (secondaryData.accounts && Array.isArray(secondaryData.accounts)) {
-                        secondaryAccounts = secondaryData.accounts;
-                    }
-
-                    // Fetch transactions for each secondary account
-                    for (const account of secondaryAccounts) {
-                        if (account?.account_number) {
-                            const txResponse = await fetch(`${API_BASE_URL}/payments/account/${account.account_number}`);
-                            if (txResponse.ok) {
-                                const txData = await txResponse.json();
-                                if (Array.isArray(txData)) {
-                                    allTransactions = [...allTransactions, ...txData];
-                                }
-                            }
-                        }
-                    }
-                }
-
-                setTransactions(allTransactions);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching transactions:', error);
-                setLoading(false);
-            }
-        };
-
-        fetchTransactions();
-    }, []);
+        // 3. Fallback
+        return tx.label || tx.description || 'Inconnu';
+    };
 
     // Group transactions by date
     const groupedTransactions = transactions.reduce((groups: any, transaction: any) => {
@@ -121,45 +90,50 @@ const TransactionsList = () => {
                 <>
                     {Object.entries(groupedTransactions).map(([date, txs]: [string, any]) => (
                         <div key={date} style={{ alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex' }}>
-                            <div style={{ color: '#8C9C9C', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '27px', wordWrap: 'break-word' }}>{date}</div>
+                            <div style={{ color: '#8C9C9C', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '27px', wordWrap: 'break-word' }}>
+                                {new Date(date).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Paris' })}
+                            </div>
                             <div style={{ alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex' }}>
-                                {(txs as any[]).map((tx, index) => (
-                                    <div key={index} style={{ alignSelf: 'stretch', height: 50, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                        <div style={{ flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex' }}>
-                                            <div style={{ width: 50, height: 50, padding: 10, background: '#8C9C9C', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
-                                                {tx.amount > 0 ? (
-                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M9.41421 16L17.7071 7.70711C18.0976 7.31658 18.0976 6.68342 17.7071 6.29289C17.3166 5.90237 16.6834 5.90237 16.2929 6.29289L8 14.5858V7C8 6.44772 7.55228 6 7 6C6.44772 6 6 6.44772 6 7V17C6 17.5523 6.44772 18 7 18H17C17.5523 18 18 17.5523 18 17C18 16.4477 17.5523 16 17 16H9.41421Z" fill="white" />
-                                                    </svg>
-                                                ) : (
-                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <g clipPath="url(#clip0)">
-                                                            <path fillRule="evenodd" clipRule="evenodd" d="M1 0C0.447715 0 0 0.447715 0 1C0 1.55228 0.447715 2 1 2H4.18032L5.01195 6.15508C5.01638 6.18353 5.02201 6.21159 5.02879 6.2392L6.69916 14.5848C6.83647 15.2751 7.21225 15.8959 7.76048 16.3373C8.3062 16.7766 8.98837 17.011 9.68864 17H19.3914C20.0916 17.011 20.7738 16.7766 21.3195 16.3373C21.868 15.8958 22.2437 15.2754 22.3808 14.5848L22.3823 14.5773L23.9823 6.18733C24.0381 5.89458 23.9605 5.59218 23.7705 5.36256C23.5805 5.13293 23.298 5 23 5H6.82043L5.98055 0.803743C5.88701 0.336385 5.47663 0 5 0H1ZM7.22073 7H21.7913L20.4185 14.1984C20.3723 14.4273 20.2474 14.6328 20.0654 14.7793C19.8826 14.9265 19.6538 15.0047 19.4192 15.0002L19.4 15H9.68L9.66084 15.0002C9.42619 15.0047 9.19743 14.9265 9.01461 14.7793C8.83179 14.6322 8.70656 14.4254 8.66084 14.1952L7.22073 7Z" fill="white" />
-                                                            <path d="M7 21C7 19.8954 7.89543 19 9 19C10.1046 19 11 19.8954 11 21C11 22.1046 10.1046 23 9 23C7.89543 23 7 22.1046 7 21Z" fill="white" />
-                                                            <path d="M18 21C18 19.8954 18.8954 19 20 19C21.1046 19 22 19.8954 22 21C22 22.1046 21.1046 23 20 23C18.8954 23 18 22.1046 18 21Z" fill="white" />
-                                                        </g>
-                                                        <defs>
-                                                            <clipPath id="clip0">
-                                                                <rect width="24" height="24" fill="white" />
-                                                            </clipPath>
-                                                        </defs>
-                                                    </svg>
-                                                )}
+                                {(txs as any[]).map((tx, index) => {
+                                    console.log('Transaction:', tx);
+                                    return (
+                                        <div key={index} style={{ alignSelf: 'stretch', height: 50, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex' }}>
+                                            <div style={{ flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex' }}>
+                                                <div style={{ width: 50, height: 50, padding: 10, background: '#8C9C9C', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
+                                                    {tx.amount > 0 ? (
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M9.41421 16L17.7071 7.70711C18.0976 7.31658 18.0976 6.68342 17.7071 6.29289C17.3166 5.90237 16.6834 5.90237 16.2929 6.29289L8 14.5858V7C8 6.44772 7.55228 6 7 6C6.44772 6 6 6.44772 6 7V17C6 17.5523 6.44772 18 7 18H17C17.5523 18 18 17.5523 18 17C18 16.4477 17.5523 16 17 16H9.41421Z" fill="white" />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <g clipPath="url(#clip0)">
+                                                                <path fillRule="evenodd" clipRule="evenodd" d="M1 0C0.447715 0 0 0.447715 0 1C0 1.55228 0.447715 2 1 2H4.18032L5.01195 6.15508C5.01638 6.18353 5.02201 6.21159 5.02879 6.2392L6.69916 14.5848C6.83647 15.2751 7.21225 15.8959 7.76048 16.3373C8.3062 16.7766 8.98837 17.011 9.68864 17H19.3914C20.0916 17.011 20.7738 16.7766 21.3195 16.3373C21.868 15.8958 22.2437 15.2754 22.3808 14.5848L22.3823 14.5773L23.9823 6.18733C24.0381 5.89458 23.9605 5.59218 23.7705 5.36256C23.5805 5.13293 23.298 5 23 5H6.82043L5.98055 0.803743C5.88701 0.336385 5.47663 0 5 0H1ZM7.22073 7H21.7913L20.4185 14.1984C20.3723 14.4273 20.2474 14.6328 20.0654 14.7793C19.8826 14.9265 19.6538 15.0047 19.4192 15.0002L19.4 15H9.68L9.66084 15.0002C9.42619 15.0047 9.19743 14.9265 9.01461 14.7793C8.83179 14.6322 8.70656 14.4254 8.66084 14.1952L7.22073 7Z" fill="white" />
+                                                                <path d="M7 21C7 19.8954 7.89543 19 9 19C10.1046 19 11 19.8954 11 21C11 22.1046 10.1046 23 9 23C7.89543 23 7 22.1046 7 21Z" fill="white" />
+                                                                <path d="M18 21C18 19.8954 18.8954 19 20 19C21.1046 19 22 19.8954 22 21C22 22.1046 21.1046 23 20 23C18.8954 23 18 22.1046 18 21Z" fill="white" />
+                                                            </g>
+                                                            <defs>
+                                                                <clipPath id="clip0">
+                                                                    <rect width="24" height="24" fill="white" />
+                                                                </clipPath>
+                                                            </defs>
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                                <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
+                                                    <div style={{ alignSelf: 'stretch', height: 20, color: '#002222', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '27px', wordWrap: 'break-word' }}>
+                                                        {tx.amount > 0 ? `Virement à ${getTransactionName(tx)}` : `Virement de ${getTransactionName(tx)}`}
+                                                    </div>
+                                                    <div style={{ alignSelf: 'stretch', height: 18, color: '#8C9C9C', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>
+                                                        {new Date(tx.date || tx.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })} • {tx.payment_method || tx.type || 'Paiement'}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
-                                                <div style={{ alignSelf: 'stretch', height: 20, color: '#002222', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '27px', wordWrap: 'break-word' }}>
-                                                    {tx.description || tx.merchant || 'Transaction'}
-                                                </div>
-                                                <div style={{ alignSelf: 'stretch', height: 18, color: '#8C9C9C', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>
-                                                    {tx.payment_method || tx.type || 'Paiement'}
-                                                </div>
+                                            <div style={{ color: tx.amount > 0 ? '#EF4444' : '#58C5C3', fontSize: 22, fontFamily: 'Inter', fontWeight: '400', lineHeight: '35.20px', wordWrap: 'break-word' }}>
+                                                {tx.amount > 0 ? '-' : '+'}{Math.abs(Number(tx.amount)).toFixed(2)} €
                                             </div>
                                         </div>
-                                        <div style={{ color: tx.amount > 0 ? '#58C5C3' : '#EB7C3F', fontSize: 22, fontFamily: 'Inter', fontWeight: '400', lineHeight: '35.20px', wordWrap: 'break-word' }}>
-                                            {tx.amount > 0 ? '+' : ''}{tx.amount} €
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     ))}

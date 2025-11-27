@@ -108,7 +108,8 @@ const Beneficiaries = () => {
                 const errorData = await response.json();
                 alert(`Erreur lors de l'ajout: ${errorData.detail || 'Erreur inconnue'}`);
             }
-        } catch (error) {
+        } catch {
+            // Ignore error
         }
     };
     const handleDeleteBeneficiary = async (id: number) => {
@@ -128,8 +129,8 @@ const Beneficiaries = () => {
                 try {
                     const errorData = await response.json();
                     alert(`Erreur lors de la suppression: ${errorData.detail || 'Erreur inconnue'}`);
-                } catch (e) {
-                    alert('Erreur lors de la suppression (réponse non-JSON).');
+                } catch {
+                    // Ignore error
                 }
             }
         } catch (error) {
@@ -150,6 +151,9 @@ const Beneficiaries = () => {
                                     <BeneficiaryCard
                                         key={beneficiary.id}
                                         id={beneficiary.id}
+                                        name={beneficiary.name}
+                                        iban={beneficiary.iban}
+                                        account_number={beneficiary.account_number}
                                         onDelete={() => handleDeleteBeneficiary(beneficiary.id)}
                                     />
                                 ))}

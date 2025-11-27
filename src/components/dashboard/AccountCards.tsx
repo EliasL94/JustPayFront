@@ -1,8 +1,44 @@
+import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import Flechehautorange from '../../assets/SVG_Dashboard/Icon-4.svg';
 import Flechezigzag from '../../assets/SVG_Dashboard/Icon-3.svg';
 import Flechebasverte from '../../assets/SVG_Dashboard/Icon-5.svg';
 
-const AccountCards = () => {
+interface AccountCardsProps {
+    accounts?: any[];
+    transactions?: any[];
+    chartData?: any[];
+}
+
+const AccountCards = ({ accounts = [], transactions = [], chartData = [] }: AccountCardsProps) => {
+    const totalBalance = accounts.reduce((sum, account) => {
+        const balance = typeof account.balance === 'string'
+            ? parseFloat(account.balance.replace(',', '.').replace('€', ''))
+            : account.balance;
+        return sum + (isNaN(balance) ? 0 : balance);
+    }, 0);
+
+    const formattedBalance = `${totalBalance.toFixed(2).replace('.', ',')}€`;
+
+    // Calculate inflows and outflows
+    const inflows = Math.abs(transactions.filter(t => t.amount < 0).reduce((acc, t) => acc + t.amount, 0));
+    const outflows = transactions.filter(t => t.amount > 0).reduce((acc, t) => acc + t.amount, 0);
+
+    const Sparkline = ({ data, dataKey, color }: { data: any[], dataKey: string, color: string }) => (
+        <div className="self-stretch h-32 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                    <defs>
+                        <linearGradient id={`color${dataKey}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+                            <stop offset="95%" stopColor={color} stopOpacity={0} />
+                        </linearGradient>
+                    </defs>
+                    <Area type="monotone" dataKey={dataKey} stroke={color} fillOpacity={1} fill={`url(#color${dataKey})`} strokeWidth={2} />
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>
+    );
+
     return (
         <div className="self-stretch inline-flex justify-start items-start gap-6">
             <div className="flex-1 px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4 overflow-hidden">
@@ -12,21 +48,10 @@ const AccountCards = () => {
                     </div>
                     <div className="inline-flex flex-col justify-start items-start gap-2">
                         <div className="justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">Solde</div>
-                        <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">1234,56€</div>
+                        <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">{formattedBalance}</div>
                     </div>
                 </div>
-                <div className="self-stretch h-60 px-4 py-2 bg-white flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                    <div className="w-64 h-32 relative">
-                        <div className="w-2 h-2 left-0 top-[118.42px] absolute bg-emerald-950 rounded-full" />
-                        <div className="w-2 h-2 left-[43.33px] top-[52.63px] absolute bg-emerald-950 rounded-full" />
-                        <div className="w-2 h-2 left-[86.67px] top-[86.84px] absolute bg-emerald-950 rounded-full" />
-                        <div className="w-2 h-2 left-[130px] top-[77.89px] absolute bg-emerald-950 rounded-full" />
-                        <div className="w-2 h-2 left-[173.33px] top-[85.53px] absolute bg-emerald-950 rounded-full" />
-                        <div className="w-2 h-2 left-[216.67px] top-0 absolute bg-emerald-950 rounded-full" />
-                        <div className="w-2 h-2 left-[260px] top-[43.42px] absolute bg-emerald-950 rounded-full" />
-                        <div className="w-64 h-28 left-[4px] top-[4px] absolute outline outline-2 outline-offset-[-1px] outline-emerald-950" />
-                    </div>
-                </div>
+                <Sparkline data={chartData} dataKey="net" color="#8B5CF6" />
             </div>
             <div className="flex-1 px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4 overflow-hidden">
                 <div className="inline-flex justify-start items-start gap-4">
@@ -35,21 +60,10 @@ const AccountCards = () => {
                     </div>
                     <div className="inline-flex flex-col justify-start items-start gap-2">
                         <div className="justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">Entrées</div>
-                        <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">1234,56€</div>
+                        <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">{inflows.toFixed(2).replace('.', ',')}€</div>
                     </div>
                 </div>
-                <div className="self-stretch h-60 px-4 py-2 bg-white flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                    <div className="w-64 h-32 relative">
-                        <div className="w-2 h-2 left-0 top-[118.42px] absolute bg-emerald-400 rounded-full" />
-                        <div className="w-2 h-2 left-[43.33px] top-[52.63px] absolute bg-emerald-400 rounded-full" />
-                        <div className="w-2 h-2 left-[86.67px] top-[86.84px] absolute bg-emerald-400 rounded-full" />
-                        <div className="w-2 h-2 left-[130px] top-[77.89px] absolute bg-emerald-400 rounded-full" />
-                        <div className="w-2 h-2 left-[173.33px] top-[85.53px] absolute bg-emerald-400 rounded-full" />
-                        <div className="w-2 h-2 left-[216.67px] top-0 absolute bg-emerald-400 rounded-full" />
-                        <div className="w-2 h-2 left-[260px] top-[43.42px] absolute bg-emerald-400 rounded-full" />
-                        <div className="w-64 h-28 left-[4px] top-[4px] absolute outline outline-2 outline-offset-[-1px] outline-emerald-400" />
-                    </div>
-                </div>
+                <Sparkline data={chartData} dataKey="income" color="#58C5C3" />
             </div>
             <div className="flex-1 px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4 overflow-hidden">
                 <div className="inline-flex justify-start items-start gap-4">
@@ -58,21 +72,10 @@ const AccountCards = () => {
                     </div>
                     <div className="inline-flex flex-col justify-start items-start gap-2">
                         <div className="justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">Sorties</div>
-                        <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">1234,56€</div>
+                        <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">{outflows.toFixed(2).replace('.', ',')}€</div>
                     </div>
                 </div>
-                <div className="self-stretch h-60 px-4 py-2 bg-white flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                    <div className="w-64 h-32 relative">
-                        <div className="w-2 h-2 left-0 top-[118.42px] absolute bg-amber-600 rounded-full" />
-                        <div className="w-2 h-2 left-[43.33px] top-[52.63px] absolute bg-amber-600 rounded-full" />
-                        <div className="w-2 h-2 left-[86.67px] top-[86.84px] absolute bg-amber-600 rounded-full" />
-                        <div className="w-2 h-2 left-[130px] top-[77.89px] absolute bg-amber-600 rounded-full" />
-                        <div className="w-2 h-2 left-[173.33px] top-[85.53px] absolute bg-amber-600 rounded-full" />
-                        <div className="w-2 h-2 left-[216.67px] top-0 absolute bg-amber-600 rounded-full" />
-                        <div className="w-2 h-2 left-[260px] top-[43.42px] absolute bg-amber-600 rounded-full" />
-                        <div className="w-64 h-28 left-[4px] top-[4px] absolute outline outline-2 outline-offset-[-1px] outline-amber-600" />
-                    </div>
-                </div>
+                <Sparkline data={chartData} dataKey="expense" color="#FB923C" />
             </div>
         </div>
     );

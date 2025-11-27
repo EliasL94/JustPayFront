@@ -5,9 +5,23 @@ import jsPDF from 'jspdf';
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
-const TransactionsHeader = () => {
-    const [selectedMonth, setSelectedMonth] = useState('Janvier 2025');
+interface TransactionsHeaderProps {
+    accounts?: any[];
+    selectedAccount?: any;
+    onSelectAccount?: (account: any) => void;
+    selectedMonth?: string;
+    onSelectMonth?: (month: string) => void;
+}
+
+const TransactionsHeader = ({
+    accounts = [],
+    selectedAccount,
+    onSelectAccount,
+    selectedMonth = 'Janvier 2025',
+    onSelectMonth
+}: TransactionsHeaderProps) => {
     const [showMonthDropdown, setShowMonthDropdown] = useState(false);
+    const [showAccountDropdown, setShowAccountDropdown] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
 
     // Generate month options for the past 12 months
@@ -41,7 +55,9 @@ const TransactionsHeader = () => {
         }
 
         try {
-            // Fetch all accounts
+            // Fetch all accounts if not provided or just use what we have?
+            // For the PDF, we usually want a full statement.
+            // Let's keep the existing logic for now to ensure it works independently of the view filter
             let allAccounts: any[] = [];
 
             const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`);
@@ -119,7 +135,7 @@ const TransactionsHeader = () => {
 
                     const date = tx.date || tx.created_at || 'N/A';
                     const description = tx.description || tx.merchant || 'Transaction';
-                    const amount = tx.amount > 0 ? `+${tx.amount}€` : `${tx.amount}€`;
+                    const amount = tx.amount > 0 ? `-${Math.abs(tx.amount)}€` : `+${Math.abs(tx.amount)}€`;
 
                     pdf.text(`${date} - ${description}: ${amount}`, 20, yPosition);
                     yPosition += 6;
@@ -145,17 +161,48 @@ const TransactionsHeader = () => {
             </div>
             <div className="flex justify-start items-center gap-2.5">
                 {/* Account Filter */}
-                <div className="w-56 inline-flex flex-col justify-start items-start">
+                <div className="w-56 inline-flex flex-col justify-start items-start relative">
                     <div className="self-stretch flex flex-col justify-start items-start gap-2">
                         <div className="self-stretch bg-white rounded-md outline outline-2 outline-offset-[-2px] outline-slate-300 flex flex-col justify-start items-start overflow-hidden">
-                            <div className="self-stretch pl-4 pr-3 py-3 inline-flex justify-start items-center gap-2 cursor-pointer">
-                                <div className="flex-1 justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">Tous mes comptes</div>
+                            <div
+                                className="self-stretch pl-4 pr-3 py-3 inline-flex justify-start items-center gap-2 cursor-pointer"
+                                onClick={() => setShowAccountDropdown(!showAccountDropdown)}
+                            >
+                                <div className="flex-1 justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">
+                                    {selectedAccount ? (selectedAccount.name || 'Compte') : 'Tous mes comptes'}
+                                </div>
                                 <div className="w-6 h-6 relative overflow-hidden flex justify-center items-center">
                                     <img src={IconChevronDown} alt="Down" className="w-3.5 h-2" />
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {/* Account Dropdown */}
+                    {showAccountDropdown && (
+                        <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-10 max-h-60 overflow-y-auto border border-slate-300">
+                            <div
+                                className="px-4 py-2 cursor-pointer hover:bg-slate-100 text-emerald-950 text-base font-normal font-['Inter']"
+                                onClick={() => {
+                                    if (onSelectAccount) onSelectAccount(null);
+                                    setShowAccountDropdown(false);
+                                }}
+                            >
+                                Tous mes comptes
+                            </div>
+                            {accounts.map((account) => (
+                                <div
+                                    key={account.id || account.account_number}
+                                    className="px-4 py-2 cursor-pointer hover:bg-slate-100 text-emerald-950 text-base font-normal font-['Inter']"
+                                    onClick={() => {
+                                        if (onSelectAccount) onSelectAccount(account);
+                                        setShowAccountDropdown(false);
+                                    }}
+                                >
+                                    {account.name || 'Compte'}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Date Filter */}
@@ -182,7 +229,7 @@ const TransactionsHeader = () => {
                                     key={month}
                                     className="px-4 py-2 cursor-pointer hover:bg-slate-100 text-emerald-950 text-base font-normal font-['Inter']"
                                     onClick={() => {
-                                        setSelectedMonth(month);
+                                        if (onSelectMonth) onSelectMonth(month);
                                         setShowMonthDropdown(false);
                                     }}
                                 >

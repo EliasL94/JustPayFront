@@ -3,7 +3,7 @@ import logoFinvo from '../../assets/jira_ops.svg';
 import loginBackground from '../../assets/loginBackground.png';
 import './loginForm.css';
 
-const API_BASE_URL = '';
+const API_BASE_URL = 'http://localhost:8000';
 
 
 const LoginForm = () => {
@@ -21,15 +21,13 @@ const LoginForm = () => {
     setStatusMessage('');
     setIsError(false);
 
-    const credentials = { email, password };
-
     try {
       const response = await fetch(`${API_BASE_URL}/auth/connexion`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({ email, password }),
       });
 
       const responseData = await response.json();
@@ -149,7 +147,7 @@ const LoginForm = () => {
             <span className="signup-text">
               Pas encore de compte ?
             </span>
-            <a href="#" className="signup-link">
+            <a href="/signin" className="signup-link">
               Ouvrez un compte
             </a>
           </div>

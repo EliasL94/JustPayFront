@@ -3,7 +3,7 @@ import cadie from '../../assets/SVG_Dashboard/Icon.svg';
 
 const RecentTransactions = () => {
     return (
-        <div className="w-full lg:flex-1 px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-8 overflow-hidden">
+        <div className="w-[914px] px-6 py-4 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-8 overflow-hidden">
             <div className="self-stretch inline-flex justify-between items-center">
                 <div className="justify-start text-emerald-950 text-2xl font-bold font-['Inter'] leading-8">Transactions récentes</div>
                 <div data-icon-left="false" data-icon-right="false" data-label="true" data-size="Large" data-style="Solid" className="px-4 py-3 bg-teal-300 rounded flex justify-center items-center gap-1.5 overflow-hidden">

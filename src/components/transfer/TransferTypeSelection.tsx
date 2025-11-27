@@ -1,12 +1,19 @@
 import IconSend from '../../assets/SVG_Dashboard/icon-send.svg';
 import IconArrowRight from '../../assets/SVG_Dashboard/icon-arrow-right.svg';
 
-const TransferTypeSelection = () => {
+interface TransferTypeSelectionProps {
+    onSelect: (type: 'internal' | 'external') => void;
+}
+
+const TransferTypeSelection = ({ onSelect }: TransferTypeSelectionProps) => {
     return (
         <div className="w-[500px] p-6 bg-white rounded-2xl flex flex-col justify-start items-start gap-12 overflow-hidden shadow-sm">
             <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">Effectuer un virement</div>
             <div className="self-stretch flex flex-col justify-start items-start gap-6">
-                <div className="self-stretch px-6 py-4 bg-teal-300 rounded-2xl inline-flex justify-between items-center overflow-hidden cursor-pointer hover:bg-teal-400 transition-colors">
+                <div
+                    onClick={() => onSelect('internal')}
+                    className="self-stretch px-6 py-4 bg-teal-300 rounded-2xl inline-flex justify-between items-center overflow-hidden cursor-pointer hover:bg-teal-400 transition-colors"
+                >
                     <div className="flex justify-start items-center gap-4">
                         <div className="w-12 h-12 p-2.5 bg-teal-200 rounded-[47px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                             <div className="w-5 h-5 relative overflow-hidden flex justify-center items-center">
@@ -22,7 +29,10 @@ const TransferTypeSelection = () => {
                         <img src={IconArrowRight} alt="Arrow" className="w-3.5 h-3.5" />
                     </div>
                 </div>
-                <div className="self-stretch px-6 py-4 bg-slate-50 rounded-2xl inline-flex justify-between items-center overflow-hidden cursor-pointer hover:bg-slate-100 transition-colors">
+                <div
+                    onClick={() => onSelect('external')}
+                    className="self-stretch px-6 py-4 bg-slate-50 rounded-2xl inline-flex justify-between items-center overflow-hidden cursor-pointer hover:bg-slate-100 transition-colors"
+                >
                     <div className="flex justify-start items-center gap-4">
                         <div className="w-12 h-12 p-2.5 bg-sky-200 rounded-[47px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                             <div className="w-5 h-5 relative overflow-hidden flex justify-center items-center">

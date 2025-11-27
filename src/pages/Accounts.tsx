@@ -10,69 +10,98 @@ const Accounts = () => {
     const [accounts, setAccounts] = useState<any[]>([]);
     const [totalAssets, setTotalAssets] = useState<string>('0,00€');
     const [primaryAccountId, setPrimaryAccountId] = useState<string | null>(null);
+    const [selectedAccountToClose, setSelectedAccountToClose] = useState<any>(null);
+
+    const fetchAccounts = async () => {
+        const userId = localStorage.getItem('user_id');
+        if (!userId) {
+            console.warn('User ID missing');
+            return;
+        }
+
+        try {
+            // Fetch all accounts
+            const response = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/?user_id=${userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Accounts data:', data); // Debug log
+
+                const accountsList = data.accounts || [];
+
+                if (Array.isArray(accountsList)) {
+                    setAccounts(accountsList);
+
+                    // Calculate total assets
+                    const total = accountsList.reduce((sum: number, account: any) => {
+                        const balance = typeof account.balance === 'string'
+                            ? parseFloat(account.balance.replace(',', '.').replace('€', ''))
+                            : account.balance;
+                        return sum + (isNaN(balance) ? 0 : balance);
+                    }, 0);
+
+                    setTotalAssets(`${total.toFixed(2).replace('.', ',')}€`);
+                } else {
+                    console.error('Data.accounts is not an array:', data);
+                    setAccounts([]);
+                }
+            } else {
+                console.error('Error fetching accounts');
+            }
+
+            // Fetch primary account
+            const primaryResponse = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/primary/${userId}`);
+            if (primaryResponse.ok) {
+                const primaryData = await primaryResponse.json();
+                console.log('Primary account data:', primaryData);
+                // Assuming primaryData is the account object or has an id field
+                setPrimaryAccountId(primaryData.id || primaryData.account_id);
+            } else {
+                console.warn('Error fetching primary account');
+            }
+
+        } catch (error) {
+            console.error('Network error:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchAccounts = async () => {
-            const userId = localStorage.getItem('user_id');
-            if (!userId) {
-                console.warn('User ID missing');
-                return;
-            }
-
-            try {
-                // Fetch all accounts
-                const response = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/?user_id=${userId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Accounts data:', data); // Debug log
-
-                    // The API returns { accounts: [...] }, so we need to access data.accounts
-                    const accountsList = data.accounts || [];
-
-                    if (Array.isArray(accountsList)) {
-                        setAccounts(accountsList);
-
-                        // Calculate total assets
-                        const total = accountsList.reduce((sum: number, account: any) => {
-                            const balance = typeof account.balance === 'string'
-                                ? parseFloat(account.balance.replace(',', '.').replace('€', ''))
-                                : account.balance;
-                            return sum + (isNaN(balance) ? 0 : balance);
-                        }, 0);
-
-                        setTotalAssets(`${total.toFixed(2).replace('.', ',')}€`);
-                    } else {
-                        console.error('Data.accounts is not an array:', data);
-                        setAccounts([]);
-                    }
-                } else {
-                    console.error('Error fetching accounts');
-                }
-
-                // Fetch primary account
-                const primaryResponse = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/primary/${userId}`);
-                if (primaryResponse.ok) {
-                    const primaryData = await primaryResponse.json();
-                    console.log('Primary account data:', primaryData);
-                    // Assuming primaryData is the account object or has an id field
-                    setPrimaryAccountId(primaryData.id || primaryData.account_id);
-                } else {
-                    console.warn('Error fetching primary account');
-                }
-
-            } catch (error) {
-                console.error('Network error:', error);
-            }
-        };
-
         fetchAccounts();
     }, []);
+
+    const handleDeleteAccount = async () => {
+        if (!selectedAccountToClose || !selectedAccountToClose.account_number) return;
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/${selectedAccountToClose.account_number}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                console.log('Account deleted successfully');
+                setIsCloseModalOpen(false);
+                setSelectedAccountToClose(null);
+                fetchAccounts(); // Refresh list
+            } else {
+                console.error('Error deleting account');
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+        }
+    };
 
     return (
         <div className="w-full px-4 md:px-6 py-12 flex flex-col justify-start items-start gap-12 bg-slate-50 min-h-screen relative">
             <AccountsHeader onAddAccount={() => setIsModalOpen(true)} totalAssets={totalAssets} />
             {isModalOpen && <AddAccountModal onClose={() => setIsModalOpen(false)} />}
-            {isCloseModalOpen && <CloseAccountModal onClose={() => setIsCloseModalOpen(false)} />}
+            {isCloseModalOpen && (
+                <CloseAccountModal
+                    onClose={() => {
+                        setIsCloseModalOpen(false);
+                        setSelectedAccountToClose(null);
+                    }}
+                    onConfirm={handleDeleteAccount}
+                />
+            )}
             <div className="w-full flex justify-start items-start gap-6">
                 <div className="w-full max-w-[925px]">
                     <div className="grid grid-cols-2 gap-6">
@@ -84,7 +113,11 @@ const Accounts = () => {
                                 balance={`${account.balance}€`} // Formatting balance
                                 iban={account.iban}
                                 account_number={account.account_number}
-                                onCloseAccount={() => setIsCloseModalOpen(true)}
+                                isPrimary={account.id === primaryAccountId}
+                                onCloseAccount={() => {
+                                    setSelectedAccountToClose(account);
+                                    setIsCloseModalOpen(true);
+                                }}
                             />
                         ))}
                     </div>

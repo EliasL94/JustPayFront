@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import logoFinvo from '../../assets/jira_ops.svg';
-import './signInForm.css';
+import './signupForm.css';
 
 const API_BASE_URL = 'http://localhost:8000';
 
-const SignInForm = () => {
+const signupForm = () => {
     const [pseudo, setPseudo] = useState('');
     const [name, setName] = useState('');
     const [firstname, setFirstname] = useState('');
@@ -19,7 +19,7 @@ const SignInForm = () => {
     const [statusMessage, setStatusMessage] = useState('');
     const [isError, setIsError] = useState(false);
 
-    const handleSignIn = async (e: React.FormEvent) => {
+    const handlesignup = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
@@ -85,11 +85,11 @@ const SignInForm = () => {
     };
 
     return (
-        <div className="signin-container">
-            <div className="signin-form-section">
-                <div className="signin-form-wrapper">
+        <div className="signup-container">
+            <div className="signup-form-section">
+                <div className="signup-form-wrapper">
 
-                    <div className="signin-logo-section">
+                    <div className="signup-logo-section">
                         <div className="w-[60px] h-[60px] relative overflow-hidden flex justify-center items-center">
                             <img
                                 src={logoFinvo}
@@ -97,21 +97,21 @@ const SignInForm = () => {
                                 className="w-full h-full object-contain"
                             />
                         </div>
-                        <div className="signin-logo-title">
+                        <div className="signup-logo-title">
                             Finvo
                         </div>
                     </div>
 
-                    <div className="signin-title-section">
-                        <h2 className="signin-title">
+                    <div className="signup-title-section">
+                        <h2 className="signup-title">
                             Créez votre compte
                         </h2>
-                        <p className="signin-subtitle">
+                        <p className="signup-subtitle">
                             Rejoignez des milliers d'utilisateurs
                         </p>
                     </div>
 
-                    <div className="signin-divider"></div>
+                    <div className="signup-divider"></div>
 
                     {statusMessage && (
                         <div className={`w-full p-3 rounded-lg text-sm font-medium ${isError ? 'bg-red-100 text-red-700' : 'bg-[#58C5C3]/10 text-[#142F2C]'}`}>
@@ -119,10 +119,10 @@ const SignInForm = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleSignIn} className="signin-form">
+                    <form onSubmit={handlesignup} className="signup-form">
 
-                        <div className="signin-form-field full-width">
-                            <label htmlFor="pseudo" className="signin-form-label">
+                        <div className="signup-form-field full-width">
+                            <label htmlFor="pseudo" className="signup-form-label">
                                 Pseudo
                             </label>
                             <input
@@ -131,13 +131,13 @@ const SignInForm = () => {
                                 value={pseudo}
                                 onChange={(e) => setPseudo(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="Votre pseudo"
                             />
                         </div>
 
-                        <div className="signin-form-field">
-                            <label htmlFor="name" className="signin-form-label">
+                        <div className="signup-form-field">
+                            <label htmlFor="name" className="signup-form-label">
                                 Nom
                             </label>
                             <input
@@ -146,13 +146,13 @@ const SignInForm = () => {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="Votre nom"
                             />
                         </div>
 
-                        <div className="signin-form-field">
-                            <label htmlFor="firstname" className="signin-form-label w-2/5">
+                        <div className="signup-form-field">
+                            <label htmlFor="firstname" className="signup-form-label w-2/5">
                                 Prénom
                             </label>
                             <input
@@ -161,13 +161,13 @@ const SignInForm = () => {
                                 value={firstname}
                                 onChange={(e) => setFirstname(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="Votre prénom"
                             />
                         </div>
 
-                        <div className="signin-form-field full-width">
-                            <label htmlFor="email" className="signin-form-label">
+                        <div className="signup-form-field full-width">
+                            <label htmlFor="email" className="signup-form-label">
                                 Email
                             </label>
                             <input
@@ -176,13 +176,13 @@ const SignInForm = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="votre.email@exemple.com"
                             />
                         </div>
 
-                        <div className="signin-form-field">
-                            <label htmlFor="password" className="signin-form-label">
+                        <div className="signup-form-field">
+                            <label htmlFor="password" className="signup-form-label">
                                 Mot de passe
                             </label>
                             <input
@@ -191,13 +191,13 @@ const SignInForm = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="********"
                             />
                         </div>
 
-                        <div className="signin-form-field">
-                            <label htmlFor="confirmPassword" className="signin-form-label">
+                        <div className="signup-form-field">
+                            <label htmlFor="confirmPassword" className="signup-form-label">
                                 Confirmez le mot de passe
                             </label>
                             <input
@@ -206,13 +206,13 @@ const SignInForm = () => {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="********"
                             />
                         </div>
 
-                        <div className="signin-form-field">
-                            <label htmlFor="age" className="signin-form-label">
+                        <div className="signup-form-field">
+                            <label htmlFor="age" className="signup-form-label">
                                 Âge
                             </label>
                             <input
@@ -223,13 +223,13 @@ const SignInForm = () => {
                                 required
                                 min="18"
                                 max="120"
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="18"
                             />
                         </div>
 
-                        <div className="signin-form-field">
-                            <label htmlFor="region" className="signin-form-label">
+                        <div className="signup-form-field">
+                            <label htmlFor="region" className="signup-form-label">
                                 Région
                             </label>
                             <input
@@ -238,13 +238,13 @@ const SignInForm = () => {
                                 value={region}
                                 onChange={(e) => setRegion(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                                 placeholder="Votre région"
                             />
                         </div>
 
-                        <div className="signin-form-field">
-                            <label htmlFor="gender" className="signin-form-label">
+                        <div className="signup-form-field">
+                            <label htmlFor="gender" className="signup-form-label">
                                 Genre
                             </label>
                             <select
@@ -252,7 +252,7 @@ const SignInForm = () => {
                                 value={gender}
                                 onChange={(e) => setGender(e.target.value)}
                                 required
-                                className="signin-form-input"
+                                className="signup-form-input"
                             >
                                 <option value="">Sélectionnez votre genre</option>
                                 <option value="male">Homme</option>
@@ -264,7 +264,7 @@ const SignInForm = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="signin-submit-button"
+                            className="signup-submit-button"
                         >
                             {loading ? (
                                 <svg className="animate-spin h-5 w-5 text-[#142F2C]" viewBox="0 0 24 24" fill="none">
@@ -277,13 +277,13 @@ const SignInForm = () => {
                         </button>
                     </form>
 
-                    <div className="signin-divider"></div>
+                    <div className="signup-divider"></div>
 
-                    <div className="signin-login-section">
-                        <span className="signin-login-text">
+                    <div className="signup-login-section">
+                        <span className="signup-login-text">
                             Vous avez déjà un compte ?
                         </span>
-                        <a href="/login" className="signin-login-link">
+                        <a href="/login" className="signup-login-link">
                             Se connecter
                         </a>
                     </div>
@@ -291,12 +291,12 @@ const SignInForm = () => {
                 </div>
             </div>
 
-            <div className="signin-hero-section">
-                <div className="signin-hero-content">
-                    <h1 className="signin-hero-title">
+            <div className="signup-hero-section">
+                <div className="signup-hero-content">
+                    <h1 className="signup-hero-title">
                         La banque,<br />simplifiée
                     </h1>
-                    <p className="signin-hero-description">
+                    <p className="signup-hero-description">
                         Dashboard tout en un pour le paiement et suivre vos transactions
                     </p>
                 </div>
@@ -305,4 +305,4 @@ const SignInForm = () => {
     );
 };
 
-export default SignInForm;
+export default signupForm;

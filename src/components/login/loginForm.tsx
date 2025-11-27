@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logoFinvo from '../../assets/jira_ops.svg';
 import loginBackground from '../../assets/loginBackground.png';
 import './loginForm.css';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 
 const LoginForm = () => {
@@ -13,6 +14,8 @@ const LoginForm = () => {
 
   const [statusMessage, setStatusMessage] = useState('');
   const [isError, setIsError] = useState(false);
+
+  const navigate = useNavigate();
 
 
   const handleLogin = async (e) => {
@@ -33,14 +36,15 @@ const LoginForm = () => {
       const responseData = await response.json();
 
       if (response.ok) {
-        setStatusMessage('Connexion réussie ! Bienvenue.');
+        setStatusMessage('Connexion réussie ! Redirection...');
         setIsError(false);
         console.log('Réponse de connexion reçue:', responseData);
-        setEmail('');
-        setPassword('');
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
       } else {
         const errorMessage = responseData.detail || 'Identifiants ou mot de passe incorrects.';
-        setStatusMessage(`Erreur de connexion: ${errorMessage}`);
+        setStatusMessage(`Erreur de connexion: ${errorMessage} `);
         setIsError(true);
       }
 
@@ -147,7 +151,7 @@ const LoginForm = () => {
             <span className="signup-text">
               Pas encore de compte ?
             </span>
-            <a href="/signin" className="signup-link">
+            <a href="/signup" className="signup-link">
               Ouvrez un compte
             </a>
           </div>

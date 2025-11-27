@@ -8,8 +8,7 @@ import Beneficiaries from './pages/Beneficiaries';
 import Transactions from './pages/Transactions';
 import Profile from './pages/Profile';
 import LoginPage from './pages/login';
-import SignIn from './pages/signin';
-
+import SignupPage from './pages/signup';
 
 import './App.css'
 
@@ -20,7 +19,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />

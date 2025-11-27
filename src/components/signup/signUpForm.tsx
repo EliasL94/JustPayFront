@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logoFinvo from '../../assets/jira_ops.svg';
 import './signupForm.css';
 
@@ -18,6 +19,8 @@ const signupForm = () => {
 
     const [statusMessage, setStatusMessage] = useState('');
     const [isError, setIsError] = useState(false);
+
+    const navigate = useNavigate();
 
     const handlesignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,9 +60,59 @@ const signupForm = () => {
             const responseData = await response.json();
 
             if (response.ok) {
-                setStatusMessage('Inscription réussie ! Bienvenue.');
+                setStatusMessage('Inscription réussie ! Connexion en cours...');
                 setIsError(false);
                 console.log('Réponse d\'inscription reçue:', responseData);
+
+                // Auto-login
+                try {
+                    const loginResponse = await fetch(`${API_BASE_URL}/auth/connexion`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    const loginData = await loginResponse.json();
+
+                    if (loginResponse.ok && loginData.token) {
+                        localStorage.setItem('token', loginData.token);
+
+                        // Fetch user details to store ID if needed (mirroring loginForm)
+                        try {
+                            const meResponse = await fetch(`${API_BASE_URL}/auth/me`, {
+                                headers: {
+                                    'Authorization': `Bearer ${loginData.token}`
+                                }
+                            });
+                            if (meResponse.ok) {
+                                const meData = await meResponse.json();
+                                if (meData.id) {
+                                    localStorage.setItem('user_id', meData.id);
+                                }
+                            }
+                        } catch (meError) {
+                            console.error('Erreur récupération user info:', meError);
+                        }
+
+                        setTimeout(() => {
+                            navigate('/dashboard');
+                        }, 1000);
+                    } else {
+                        setStatusMessage('Inscription réussie, mais échec de la connexion automatique. Veuillez vous connecter.');
+                        setTimeout(() => {
+                            navigate('/login');
+                        }, 2000);
+                    }
+                } catch (loginError) {
+                    console.error('Erreur auto-login:', loginError);
+                    setStatusMessage('Inscription réussie. Veuillez vous connecter.');
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 2000);
+                }
+
                 setPseudo('');
                 setName('');
                 setFirstname('');

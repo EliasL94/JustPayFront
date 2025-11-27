@@ -89,10 +89,17 @@ const Accounts = () => {
         }
     };
 
+    const handleAddAccount = (newAccount: { name: string; balance: string; iban: string; type: string }) => {
+        // Optimistic update for now since we don't have the API endpoint for creation in this context
+        // We assign a temporary ID
+        const accountWithId = { ...newAccount, id: `temp-${Date.now()}` };
+        setAccounts([...accounts, accountWithId]);
+    };
+
     return (
         <div className="w-full px-4 md:px-6 py-12 flex flex-col justify-start items-start gap-12 bg-slate-50 min-h-screen relative">
             <AccountsHeader onAddAccount={() => setIsModalOpen(true)} totalAssets={totalAssets} />
-            {isModalOpen && <AddAccountModal onClose={() => setIsModalOpen(false)} />}
+            {isModalOpen && <AddAccountModal onClose={() => setIsModalOpen(false)} onAccountCreated={handleAddAccount} />}
             {isCloseModalOpen && (
                 <CloseAccountModal
                     onClose={() => {

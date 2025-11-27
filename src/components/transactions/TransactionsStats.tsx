@@ -1,41 +1,48 @@
-import IconIncome from '../../assets/SVG_Dashboard/icon-plus.svg'; // Placeholder for income
-import IconOutcome from '../../assets/SVG_Dashboard/icon-send.svg'; // Placeholder for outcome
-import IconTransactions from '../../assets/SVG_Sidebar/icon-list.svg';
 
 const TransactionsStats = () => {
     return (
-        <div className="flex-1 inline-flex flex-col justify-start items-start gap-6">
-            <div className="self-stretch px-6 py-4 bg-white rounded-2xl inline-flex justify-start items-start gap-4 overflow-hidden border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 p-2.5 bg-sky-200 rounded-[47px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                    <div className="w-6 h-6 relative overflow-hidden flex justify-center items-center">
-                        <img src={IconIncome} alt="Income" className="w-4 h-4" />
-                    </div>
+        <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex' }}>
+            {/* Entrées */}
+            <div style={{ alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, background: 'white', overflow: 'hidden', borderRadius: 16, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex' }}>
+                <div style={{ width: 50, height: 50, padding: 10, background: '#B4E5E4', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5V16.5858L5.70711 11.2929C5.31658 10.9024 4.68342 10.9024 4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071L11.2929 19.7071C11.6834 20.0976 12.3166 20.0976 12.7071 19.7071L19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929C19.3166 10.9024 18.6834 10.9024 18.2929 11.2929L13 16.5858V5Z" fill="#4BA7A6" />
+                    </svg>
                 </div>
-                <div className="inline-flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">Entrées</div>
-                    <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">1234,56€</div>
-                </div>
-            </div>
-            <div className="self-stretch px-6 py-4 bg-white rounded-2xl inline-flex justify-start items-start gap-4 overflow-hidden border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 p-2.5 bg-orange-200 rounded-[47px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                    <div className="w-6 h-6 relative overflow-hidden flex justify-center items-center">
-                        <img src={IconOutcome} alt="Outcome" className="w-4 h-4" />
-                    </div>
-                </div>
-                <div className="inline-flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">Sorties</div>
-                    <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">168,24€</div>
+                <div style={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
+                    <div style={{ color: '#002222', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>Entrées</div>
+                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>1234,56€</div>
                 </div>
             </div>
-            <div className="self-stretch px-6 py-4 bg-white rounded-2xl inline-flex justify-start items-start gap-4 overflow-hidden border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 p-2.5 bg-violet-100 rounded-[47px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                    <div className="w-6 h-6 relative overflow-hidden flex justify-center items-center">
-                        <img src={IconTransactions} alt="Transactions" className="w-5 h-3.5" />
-                    </div>
+
+            {/* Sorties */}
+            <div style={{ alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, background: 'white', overflow: 'hidden', borderRadius: 16, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex' }}>
+                <div style={{ width: 50, height: 50, padding: 10, background: '#F6C4A9', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.7071 4.29289C12.3166 3.90237 11.6834 3.90237 11.2929 4.29289L4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071C4.68342 13.0976 5.31658 13.0976 5.70711 12.7071L11 7.41421V19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19V7.41421L18.2929 12.7071C18.6834 13.0976 19.3166 13.0976 19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929L12.7071 4.29289Z" fill="#C86936" />
+                    </svg>
                 </div>
-                <div className="inline-flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-emerald-950 text-base font-normal font-['Inter'] leading-6">Transactions</div>
-                    <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">26</div>
+                <div style={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
+                    <div style={{ color: '#002222', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>Sorties</div>
+                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>168,24€</div>
+                </div>
+            </div>
+
+            {/* Transactions */}
+            <div style={{ alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, background: 'white', overflow: 'hidden', borderRadius: 16, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex' }}>
+                <div style={{ width: 50, height: 50, padding: 10, background: '#EEE7FE', overflow: 'hidden', borderRadius: 47, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 5C2.44772 5 2 5.44772 2 6C2 6.55228 2.44772 7 3 7H3.01C3.56228 7 4.01 6.55228 4.01 6C4.01 5.44772 3.56228 5 3.01 5H3Z" fill="#7D53DD" />
+                        <path d="M8 5C7.44772 5 7 5.44772 7 6C7 6.55228 7.44772 7 8 7H21C21.5523 7 22 6.55228 22 6C22 5.44772 21.5523 5 21 5H8Z" fill="#7D53DD" />
+                        <path d="M8 11C7.44772 11 7 11.4477 7 12C7 12.5523 7.44772 13 8 13H21C21.5523 13 22 12.5523 22 12C22 11.4477 21.5523 11 21 11H8Z" fill="#7D53DD" />
+                        <path d="M7 18C7 17.4477 7.44772 17 8 17H21C21.5523 17 22 17.4477 22 18C22 18.5523 21.5523 19 21 19H8C7.44772 19 7 18.5523 7 18Z" fill="#7D53DD" />
+                        <path d="M2 12C2 11.4477 2.44772 11 3 11H3.01C3.56228 11 4.01 11.4477 4.01 12C4.01 12.5523 3.56228 13 3.01 13H3C2.44772 13 2 12.5523 2 12Z" fill="#7D53DD" />
+                        <path d="M3 17C2.44772 17 2 17.4477 2 18C2 18.5523 2.44772 19 3 19H3.01C3.56228 19 4.01 18.5523 4.01 18C4.01 17.4477 3.56228 17 3.01 17H3Z" fill="#7D53DD" />
+                    </svg>
+                </div>
+                <div style={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
+                    <div style={{ color: '#002222', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: '24px', wordWrap: 'break-word' }}>Transactions</div>
+                    <div style={{ color: '#002222', fontSize: 40, fontFamily: 'Inter', fontWeight: '700', lineHeight: '48px', letterSpacing: 0.40, wordWrap: 'break-word' }}>26</div>
                 </div>
             </div>
         </div>

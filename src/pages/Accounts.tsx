@@ -8,9 +8,9 @@ const Accounts = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
     const [accounts, setAccounts] = useState<any[]>([]);
-    const [totalAssets, setTotalAssets] = useState<string>('0,00€');
-    const [primaryAccountId, setPrimaryAccountId] = useState<string | null>(null);
+    const [totalAssets, setTotalAssets] = useState<string>('0,00');
     const [selectedAccountToClose, setSelectedAccountToClose] = useState<any>(null);
+    const [userDetails, setUserDetails] = useState<any>(null);
 
     const fetchAccounts = async () => {
         const userId = localStorage.getItem('user_id');
@@ -20,52 +20,82 @@ const Accounts = () => {
         }
 
         try {
-            // Fetch all accounts
-            const response = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/?user_id=${userId}`);
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Accounts data:', data); // Debug log
-
-                const accountsList = data.accounts || [];
-
-                if (Array.isArray(accountsList)) {
-                    setAccounts(accountsList);
-
-                    // Calculate total assets
-                    const total = accountsList.reduce((sum: number, account: any) => {
-                        const balance = typeof account.balance === 'string'
-                            ? parseFloat(account.balance.replace(',', '.').replace('€', ''))
-                            : account.balance;
-                        return sum + (isNaN(balance) ? 0 : balance);
-                    }, 0);
-
-                    setTotalAssets(`${total.toFixed(2).replace('.', ',')}€`);
-                } else {
-                    console.error('Data.accounts is not an array:', data);
-                    setAccounts([]);
-                }
-            } else {
-                console.error('Error fetching accounts');
-            }
+            let allAccounts: any[] = [];
 
             // Fetch primary account
             const primaryResponse = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/primary/${userId}`);
             if (primaryResponse.ok) {
                 const primaryData = await primaryResponse.json();
                 console.log('Primary account data:', primaryData);
-                // Assuming primaryData is the account object or has an id field
-                setPrimaryAccountId(primaryData.id || primaryData.account_id);
+                if (primaryData) {
+                    // Normalize primary account data if needed, assuming it returns a single object
+                    const primaryAccount = { ...primaryData, type: 'primary' };
+                    allAccounts.push(primaryAccount);
+                }
             } else {
                 console.warn('Error fetching primary account');
             }
+
+            // Fetch secondary accounts
+            const secondaryResponse = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/secondary/${userId}`);
+            if (secondaryResponse.ok) {
+                const secondaryData = await secondaryResponse.json();
+                console.log('Secondary accounts data:', secondaryData);
+
+                let secondaryAccountsList: any[] = [];
+                if (Array.isArray(secondaryData)) {
+                    secondaryAccountsList = secondaryData;
+                } else if (secondaryData.accounts && Array.isArray(secondaryData.accounts)) {
+                    secondaryAccountsList = secondaryData.accounts;
+                }
+
+                // Tag them as secondary
+                const taggedSecondaryAccounts = secondaryAccountsList.map(acc => ({ ...acc, type: 'secondary' }));
+                allAccounts = [...allAccounts, ...taggedSecondaryAccounts];
+
+            } else {
+                console.warn('Error fetching secondary accounts');
+            }
+
+            setAccounts(allAccounts);
+
+            // Calculate total assets
+            const total = allAccounts.reduce((sum: number, account: any) => {
+                const balance = typeof account.balance === 'string'
+                    ? parseFloat(account.balance.replace(',', '.').replace('€', ''))
+                    : account.balance;
+                return sum + (isNaN(balance) ? 0 : balance);
+            }, 0);
+
+            setTotalAssets(`${total.toFixed(2).replace('.', ',')}€`);
 
         } catch (error) {
             console.error('Network error:', error);
         }
     };
 
+    const fetchUserDetails = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUserDetails(data);
+            }
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+        }
+    };
+
     useEffect(() => {
         fetchAccounts();
+        fetchUserDetails();
     }, []);
 
     const handleDeleteAccount = async () => {
@@ -89,11 +119,46 @@ const Accounts = () => {
         }
     };
 
-    const handleAddAccount = (newAccount: { name: string; balance: string; iban: string; type: string }) => {
-        // Optimistic update for now since we don't have the API endpoint for creation in this context
-        // We assign a temporary ID
-        const accountWithId = { ...newAccount, id: `temp-${Date.now()}` };
-        setAccounts([...accounts, accountWithId]);
+    const createSecondaryAccount = async (accountName: string) => {
+        if (!userDetails) {
+            console.error('User details not available');
+            return;
+        }
+
+        const params = new URLSearchParams({
+            name: accountName,
+            firstname: userDetails.firstname || userDetails.first_name || '', // Adjust based on API response
+            email: userDetails.email,
+            age: userDetails.age ? userDetails.age.toString() : '18', // Default or handle missing age
+            user_id: userDetails.id
+        });
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/secondary?${params.toString()}`, {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                console.log('Secondary account created successfully');
+                fetchAccounts();
+                setIsModalOpen(false);
+            } else {
+                console.error('Error creating secondary account');
+                const errorData = await response.json();
+                console.error(errorData);
+                alert('Erreur lors de la création du compte');
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+            alert('Erreur réseau');
+        }
+    };
+
+    const handleAddAccount = (newAccount: { name: string }) => {
+        createSecondaryAccount(newAccount.name);
     };
 
     return (
@@ -107,6 +172,8 @@ const Accounts = () => {
                         setSelectedAccountToClose(null);
                     }}
                     onConfirm={handleDeleteAccount}
+                    accountName={selectedAccountToClose?.name}
+                    userEmail={userDetails?.email}
                 />
             )}
             <div className="w-full flex justify-start items-start gap-6">
@@ -116,11 +183,11 @@ const Accounts = () => {
                             <AccountCard
                                 key={account.id}
                                 id={account.id}
-                                name={account.id === primaryAccountId ? "Principal" : "Secondaire"}
-                                balance={`${account.balance}€`} // Formatting balance
+                                name={account.name || (account.type === 'primary' ? "Compte Principal" : "Compte Secondaire")}
+                                balance={`${account.balance}€`}
                                 iban={account.iban}
                                 account_number={account.account_number}
-                                isPrimary={account.id === primaryAccountId}
+                                isPrimary={account.type === 'primary'}
                                 onCloseAccount={() => {
                                     setSelectedAccountToClose(account);
                                     setIsCloseModalOpen(true);

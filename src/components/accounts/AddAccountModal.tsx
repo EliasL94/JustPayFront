@@ -3,7 +3,7 @@ import IconChevronUp from '../../assets/SVG_Dashboard/icon-chevron-up.svg';
 
 interface AddAccountModalProps {
     onClose: () => void;
-    onAccountCreated: (account: { name: string; balance: string; iban: string; type: string }) => void;
+    onAccountCreated: (account: { name: string }) => void;
 }
 
 const AddAccountModal = ({ onClose, onAccountCreated }: AddAccountModalProps) => {
@@ -16,17 +16,7 @@ const AddAccountModal = ({ onClose, onAccountCreated }: AddAccountModalProps) =>
             return;
         }
 
-        // Mock IBAN generation
-        const mockIban = `FR76 ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)}...`;
-
-        const newAccount = {
-            name: accountName,
-            balance: '0,00€', // Initial balance
-            iban: mockIban,
-            type: accountType
-        };
-
-        onAccountCreated(newAccount);
+        onAccountCreated({ name: accountName });
         onClose();
     };
 

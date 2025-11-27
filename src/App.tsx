@@ -19,6 +19,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/accounts" element={<Accounts />} />
@@ -26,9 +29,6 @@ function App() {
           <Route path="/beneficiaries" element={<Beneficiaries />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/signin" element={<SignIn />} />
         </Route>
       </Routes>
     </Router>

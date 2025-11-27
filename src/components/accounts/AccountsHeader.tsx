@@ -1,27 +1,27 @@
-import IconPlus from '../../assets/SVG_Dashboard/icon-plus.svg';
-
 interface AccountsHeaderProps {
     onAddAccount: () => void;
+    totalAssets: string;
 }
 
-const AccountsHeader = ({ onAddAccount }: AccountsHeaderProps) => {
+const AccountsHeader = ({ onAddAccount, totalAssets }: AccountsHeaderProps) => {
     return (
-        <div className="self-stretch inline-flex justify-between items-start">
-            <div className="flex-1 inline-flex flex-col justify-start items-start gap-2.5">
-                <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">Mes comptes</div>
-                <div className="justify-start">
-                    <span className="text-neutral-400 text-lg font-normal font-['Inter'] leading-7">Total des actifs: </span>
-                    <span className="text-neutral-400 text-lg font-bold font-['Inter'] leading-7">1234,56€ </span>
+        <div className="self-stretch flex justify-between items-start">
+            <div className="flex flex-col justify-start items-start gap-2">
+                <div className="text-[#002222] text-[32px] font-bold font-['Inter'] leading-[48px]">Mes comptes</div>
+                <div className="text-[#8C9C9C] text-lg font-normal font-['Inter'] leading-7">
+                    Total des actifs: <span className="text-[#002222] font-bold">{totalAssets}</span>
                 </div>
             </div>
-            <div className="flex justify-start items-center gap-2.5">
-                <div onClick={onAddAccount} data-icon-left="false" data-icon-right="true" data-label="true" data-size="Large" data-style="Outline" className="px-6 py-4 rounded-md outline outline-2 outline-offset-[-2px] outline-emerald-950 flex justify-center items-center gap-2 overflow-hidden cursor-pointer hover:bg-emerald-50 transition-colors">
-                    <div className="justify-start text-emerald-950 text-lg font-bold font-['Inter'] leading-6">Ajouter un compte</div>
-                    <div className="w-4 h-6 relative flex justify-center items-center">
-                        <img src={IconPlus} alt="Plus" className="w-4 h-4" />
-                    </div>
-                </div>
-            </div>
+            <button
+                onClick={onAddAccount}
+                className="px-4 py-3 bg-white rounded-md border-2 border-[#002222] flex justify-center items-center gap-2 overflow-hidden hover:bg-gray-50 transition-colors"
+            >
+                <div className="text-[#002222] text-sm font-bold font-['Inter'] leading-6">Ajouter un compte</div>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 4.16666V15.8333" stroke="#002222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M4.16675 10H15.8334" stroke="#002222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </button>
         </div>
     );
 };

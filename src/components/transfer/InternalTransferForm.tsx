@@ -14,9 +14,9 @@ const InternalTransferForm = ({ onBack, onSuccess, accounts }: InternalTransferF
 
     useEffect(() => {
         if (accounts.length > 0) {
-            // Default to first account for debit
+
             setSelectedDebitAccount(accounts[0].account_number);
-            // Default to second account for credit if available, else first
+
             if (accounts.length > 1) {
                 setSelectedCreditAccount(accounts[1].account_number);
             } else {
@@ -33,7 +33,7 @@ const InternalTransferForm = ({ onBack, onSuccess, accounts }: InternalTransferF
         }
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/payments/transfer?user_id=${userId}&account_number=${selectedDebitAccount}&beneficiary_account_number=${selectedCreditAccount}&amount=${Number(amount) * 100}`, {
+            const response = await fetch(`http://127.0.0.1:8000/payments/transfer?user_id=${userId}&account_number=${selectedDebitAccount}&beneficiary_account_number=${selectedCreditAccount}&amount=${Math.round(Number(amount) * 100)}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -66,23 +66,23 @@ const InternalTransferForm = ({ onBack, onSuccess, accounts }: InternalTransferF
     return (
         <div className="self-stretch self-stretch px-6 py-12 inline-flex flex-col justify-start items-center gap-12">
             <div className="inline-flex justify-start items-center gap-4">
-                <div className="flex justify-start items-center gap-6 flex-wrap content-center">
+                <div className="flex justify-start items-center gap-6">
                     <div className="w-12 h-12 px-3.5 py-0.5 bg-teal-100 rounded-[48px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                         <div className="w-2 h-6 justify-start text-black text-lg font-bold font-['Inter'] leading-6">1</div>
                     </div>
                     <div className="justify-start text-gray-500 text-lg font-bold font-['Inter'] leading-6">Type de virement</div>
-                    <div className="w-24 h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-400"></div>
                 </div>
-                <div className="w-72 flex justify-start items-center gap-6 flex-wrap content-center">
+                <div className="w-24 h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-400"></div>
+                <div className="flex justify-start items-center gap-6">
                     <div className="w-12 h-12 px-3.5 py-0.5 bg-teal-300 rounded-[48px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                         <div className="justify-start text-black text-lg font-bold font-['Inter'] leading-6">2</div>
                     </div>
                     <div className="justify-start text-teal-300 text-lg font-bold font-['Inter'] leading-6">Bénéficiaire</div>
-                    <div className="w-24 h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-400"></div>
                 </div>
-                <div className="flex justify-start items-center gap-6 flex-wrap content-center">
+                <div className="w-24 h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-400"></div>
+                <div className="flex justify-start items-center gap-6">
                     <div className="w-12 h-12 px-3.5 py-0.5 bg-teal-100 rounded-[48px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                        <div className="justify-start text-black text-lg font-bold font-['Inter'] leading-6">4</div>
+                        <div className="justify-start text-black text-lg font-bold font-['Inter'] leading-6">3</div>
                     </div>
                     <div className="justify-start text-gray-500 text-lg font-bold font-['Inter'] leading-6">Confirmation</div>
                 </div>

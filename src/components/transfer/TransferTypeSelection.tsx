@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import IconSend from '../../assets/SVG_Dashboard/icon-send.svg';
 import IconArrowRight from '../../assets/SVG_Dashboard/icon-arrow-right.svg';
 
@@ -6,6 +7,8 @@ interface TransferTypeSelectionProps {
 }
 
 const TransferTypeSelection = ({ onSelect }: TransferTypeSelectionProps) => {
+    const navigate = useNavigate();
+
     return (
         <div className="w-[500px] p-6 bg-white rounded-2xl flex flex-col justify-start items-start gap-12 overflow-hidden shadow-sm">
             <div className="justify-start text-emerald-950 text-4xl font-bold font-['Inter'] leading-[48px] tracking-tight">Effectuer un virement</div>
@@ -50,7 +53,7 @@ const TransferTypeSelection = ({ onSelect }: TransferTypeSelectionProps) => {
                 </div>
             </div>
             <div className="self-stretch inline-flex justify-between items-start">
-                <div data-icon-left="false" data-icon-right="false" data-label="true" data-size="Large" data-style="Outline" className="px-6 py-4 rounded-md outline outline-2 outline-offset-[-2px] outline-emerald-950 flex justify-center items-center gap-2 overflow-hidden cursor-pointer hover:bg-emerald-50 transition-colors">
+                <div onClick={() => navigate('/dashboard')} data-icon-left="false" data-icon-right="false" data-label="true" data-size="Large" data-style="Outline" className="px-6 py-4 rounded-md outline outline-2 outline-offset-[-2px] outline-emerald-950 flex justify-center items-center gap-2 overflow-hidden cursor-pointer hover:bg-emerald-50 transition-colors">
                     <div className="justify-start text-emerald-950 text-lg font-bold font-['Inter'] leading-6">Annuler</div>
                 </div>
                 <div data-icon-left="false" data-icon-right="false" data-label="true" data-size="Large" data-style="Solid" className="px-6 py-4 bg-teal-300 rounded-md flex justify-center items-center gap-2 overflow-hidden cursor-pointer hover:bg-teal-400 transition-colors">

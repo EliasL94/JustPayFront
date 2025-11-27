@@ -20,7 +20,7 @@ const Transactions = () => {
             if (!userId) return;
 
             try {
-                // Fetch Accounts
+
                 let allAccounts: any[] = [];
                 const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`);
                 if (primaryResponse.ok) {
@@ -39,7 +39,6 @@ const Transactions = () => {
                 }
                 setAccounts(allAccounts);
 
-                // Fetch Beneficiaries
                 const benResponse = await fetch(`${API_BASE_URL}/beneficiaries/user/${userId}`);
                 if (benResponse.ok) {
                     const benData = await benResponse.json();
@@ -67,7 +66,6 @@ const Transactions = () => {
                 let allTransactions: any[] = [];
 
                 if (selectedAccount) {
-                    // Fetch for specific account
                     const txResponse = await fetch(`${API_BASE_URL}/payments/account/${selectedAccount.account_number}`);
                     if (txResponse.ok) {
                         const txData = await txResponse.json();
@@ -76,12 +74,6 @@ const Transactions = () => {
                         }
                     }
                 } else {
-                    // Fetch for all accounts
-                    // We need to use the accounts state, but it might not be ready in the first render if we depend on it.
-                    // However, we can re-fetch or use the accounts if they are already loaded.
-                    // To be safe and simple, let's iterate over the accounts state if available, or fetch again if needed.
-                    // Since this effect depends on `accounts`, it will run when accounts are loaded.
-
                     for (const account of accounts) {
                         if (account?.account_number) {
                             const txResponse = await fetch(`${API_BASE_URL}/payments/account/${account.account_number}`);
@@ -106,8 +98,6 @@ const Transactions = () => {
         if (accounts.length > 0) {
             fetchTransactions();
         } else {
-            // If no accounts yet, maybe we are still loading accounts.
-            // But if we truly have no accounts, we should stop loading.
             setLoading(false);
         }
 

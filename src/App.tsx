@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
 import Transfer from './pages/Transfer';
@@ -20,13 +21,15 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/accounts" element={<Accounts />} />
-          <Route path="/transfer" element={<Transfer />} />
-          <Route path="/beneficiaries" element={<Beneficiaries />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/profile" element={<Profile />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/transfer" element={<Transfer />} />
+            <Route path="/beneficiaries" element={<Beneficiaries />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

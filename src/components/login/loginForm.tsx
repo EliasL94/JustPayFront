@@ -18,7 +18,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
 
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setStatusMessage('');
@@ -39,9 +39,36 @@ const LoginForm = () => {
         setStatusMessage('Connexion réussie ! Redirection...');
         setIsError(false);
         console.log('Réponse de connexion reçue:', responseData);
+
+        if (responseData.token) {
+          localStorage.setItem('token', responseData.token);
+
+          try {
+            const meResponse = await fetch('http://127.0.0.1:8000/auth/me', {
+              headers: {
+                'Authorization': `Bearer ${responseData.token}`
+              }
+            });
+
+            if (meResponse.ok) {
+              const userData = await meResponse.json();
+              console.log('Données utilisateur reçues:', userData);
+              if (userData.id) {
+                localStorage.setItem('user_id', userData.id);
+              }
+            } else {
+              console.error('Erreur lors de la récupération des infos utilisateur');
+            }
+          } catch (error) {
+            console.error('Erreur lors de l\'appel à /me:', error);
+          }
+        } else {
+          console.error('Aucun token trouvé dans la réponse !');
+        }
+
         setTimeout(() => {
           navigate('/dashboard');
-        }, 1000);
+        }, 1500);
       } else {
         const errorMessage = responseData.detail || 'Identifiants ou mot de passe incorrects.';
         setStatusMessage(`Erreur de connexion: ${errorMessage} `);

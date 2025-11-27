@@ -1,18 +1,38 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import Accounts from './pages/Accounts';
+import Transfer from './pages/Transfer';
+import Beneficiaries from './pages/Beneficiaries';
+import Transactions from './pages/Transactions';
+import Profile from './pages/Profile';
 import LoginPage from './pages/login';
 import SignIn from './pages/signin';
 
-const App = () => {
+
+import './App.css'
+
+function App() {
+
+
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/signin" element={<SignIn />} />
-        {/* Ajoutez d'autres routes ici */}
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/transfer" element={<Transfer />} />
+          <Route path="/beneficiaries" element={<Beneficiaries />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/signin" element={<SignIn />} />
+        </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-};
+}
 
 export default App;

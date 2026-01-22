@@ -1,6 +1,4 @@
 
-// The snippet uses some hardcoded SVGs or divs. I will try to use the provided structure.
-
 interface InternalTransferSuccessProps {
     amount: string;
     recipientName: string;
@@ -8,6 +6,7 @@ interface InternalTransferSuccessProps {
     onNewTransfer?: () => void;
 }
 
+// COMPOSANT SUCCÈS VIREMENT : Affiche le message de confirmation après un virement réussi et permet de télécharger le reçu.
 const InternalTransferSuccess = ({ amount, recipientName, onDownloadReceipt, onNewTransfer }: InternalTransferSuccessProps) => {
     return (
         <div className="self-stretch self-stretch px-6 py-12 inline-flex flex-col justify-start items-center gap-12">

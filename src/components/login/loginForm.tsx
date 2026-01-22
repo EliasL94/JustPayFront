@@ -4,7 +4,7 @@ import logoFinvo from '../../assets/jira_ops.svg';
 import loginBackground from '../../assets/loginBackground.png';
 import './loginForm.css';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 
 const LoginForm = () => {
@@ -29,6 +29,7 @@ const LoginForm = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
         },
         body: JSON.stringify({ email, password }),
       });
@@ -44,7 +45,7 @@ const LoginForm = () => {
           localStorage.setItem('token', responseData.token);
 
           try {
-            const meResponse = await fetch('http://127.0.0.1:8000/auth/me', {
+            const meResponse = await fetch(`${API_BASE_URL}/auth/me`, {
               headers: {
                 'Authorization': `Bearer ${responseData.token}`
               }

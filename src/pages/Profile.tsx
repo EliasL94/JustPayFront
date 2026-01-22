@@ -6,15 +6,17 @@ import ChangeEmailForm from '../components/profile/ChangeEmailForm';
 const Profile = () => {
     const [userDetails, setUserDetails] = useState<any>(null);
 
+    // Récupération des informations de l'utilisateur
     useEffect(() => {
         const fetchUserDetails = async () => {
             const token = localStorage.getItem('token');
             if (!token) return;
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/auth/me', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'ngrok-skip-browser-warning': 'true'
                     }
                 });
                 if (response.ok) {

@@ -7,12 +7,14 @@ interface ExternalTransferFormProps {
     onSuccess: (amount: string, recipient: string) => void;
 }
 
+// COMPOSANT VIREMENT EXTERNE : Formulaire pour virer de l'argent à un bénéficiaire enregistré. Il permet de choisir le compte débité, le bénéficiaire et le montant.
 const ExternalTransferForm = ({ onBack, accounts, beneficiaries, onSuccess }: ExternalTransferFormProps) => {
     const [amount, setAmount] = useState('');
     const [label, setLabel] = useState('');
     const [selectedDebitAccount, setSelectedDebitAccount] = useState<string>('');
     const [selectedBeneficiaryId, setSelectedBeneficiaryId] = useState<string>('');
 
+    // Sélection par défaut du premier compte et du premier bénéficiaire
     useEffect(() => {
         if (accounts.length > 0) {
             setSelectedDebitAccount(accounts[0].account_number);
@@ -22,6 +24,7 @@ const ExternalTransferForm = ({ onBack, accounts, beneficiaries, onSuccess }: Ex
         }
     }, [accounts, beneficiaries]);
 
+    // Gestion de la soumission du virement externe
     const handleSubmit = async () => {
         const userId = localStorage.getItem('user_id');
         const selectedBeneficiary = beneficiaries.find(b => b.id === selectedBeneficiaryId);
@@ -30,12 +33,24 @@ const ExternalTransferForm = ({ onBack, accounts, beneficiaries, onSuccess }: Ex
             alert("Veuillez remplir tous les champs obligatoires.");
             return;
         }
+        const debitAccount = accounts.find(acc => acc.account_number === selectedDebitAccount);
+        if (debitAccount) {
+            const balance = typeof debitAccount.balance === 'string'
+                ? parseFloat(debitAccount.balance.replace(',', '.').replace('€', ''))
+                : debitAccount.balance;
+
+            if (parseFloat(amount) > balance) {
+                alert("Solde insuffisant pour effectuer ce virement.");
+                return;
+            }
+        }
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/payments/transfer?user_id=${userId}&account_number=${selectedDebitAccount}&beneficiary_account_number=${selectedBeneficiary.account_number}&amount=${Math.round(Number(amount) * 100)}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/transfer?user_id=${userId}&account_number=${selectedDebitAccount}&beneficiary_account_number=${selectedBeneficiary.account_number}&amount=${Math.round(Number(amount) * 100)}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
                 }
             });
 

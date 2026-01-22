@@ -10,6 +10,7 @@ interface DashboardHeaderProps {
     onSelectAccount?: (account: any) => void;
 }
 
+// COMPOSANT EN-TÊTE DASHBOARD : Affiche le message de bienvenue et le sélecteur de compte.
 const DashboardHeader = ({ userName, userFirstname, accounts = [], selectedAccount, onSelectAccount }: DashboardHeaderProps) => {
     const displayName = userFirstname || userName || 'Alex';
     const currentDate = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });

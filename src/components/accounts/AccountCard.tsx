@@ -8,7 +8,7 @@ interface AccountCardProps {
     onCloseAccount: () => void;
 }
 
-const AccountCard = ({ id, name, balance, iban, account_number, isPrimary, onCloseAccount }: AccountCardProps) => {
+const AccountCard = ({ id: _id, name, balance, iban, account_number, isPrimary, onCloseAccount }: AccountCardProps) => {
     return (
         <div className="w-full p-6 bg-white rounded-2xl flex flex-col justify-start items-start gap-4 shadow-sm border border-gray-100">
             <div className="w-full flex justify-start items-start gap-4">
@@ -24,8 +24,8 @@ const AccountCard = ({ id, name, balance, iban, account_number, isPrimary, onClo
                     onClick={isPrimary ? undefined : onCloseAccount}
                     disabled={isPrimary}
                     className={`px-3 py-2 rounded-md border-2 flex justify-center items-center gap-2 overflow-hidden transition-colors ${isPrimary
-                            ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                            : 'border-[#002222] hover:bg-gray-50 cursor-pointer'
+                        ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                        : 'border-[#002222] hover:bg-gray-50 cursor-pointer'
                         }`}
                 >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

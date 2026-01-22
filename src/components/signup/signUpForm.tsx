@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import logoFinvo from '../../assets/jira_ops.svg';
 import './signupForm.css';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const signupForm = () => {
     const [pseudo, setPseudo] = useState('');
@@ -53,6 +53,7 @@ const signupForm = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true',
                 },
                 body: JSON.stringify({ pseudo, name, firstname, email, password, age, region, gender }),
             });
@@ -70,6 +71,7 @@ const signupForm = () => {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true',
                         },
                         body: JSON.stringify({ email, password }),
                     });

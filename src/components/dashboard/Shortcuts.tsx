@@ -5,6 +5,7 @@ import IconSend from '../../assets/SVG_Dashboard/icon-send.svg';
 import IconUserPlus from '../../assets/SVG_Dashboard/icon-user-plus.svg';
 import IconPlus from '../../assets/SVG_Dashboard/icon-plus.svg';
 
+// COMPOSANT RACCOURCIS : Boutons d'accès rapide pour les actions fréquentes (Virement, RIB, etc.)
 const Shortcuts = () => {
     const navigate = useNavigate();
 

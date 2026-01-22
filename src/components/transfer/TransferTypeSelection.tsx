@@ -6,6 +6,7 @@ interface TransferTypeSelectionProps {
     onSelect: (type: 'internal' | 'external') => void;
 }
 
+// COMPOSANT SÉLECTION TYPE VIREMENT : Permet à l'utilisateur de choisir entre un virement interne (entre ses comptes) et un virement externe (vers un tiers).
 const TransferTypeSelection = ({ onSelect }: TransferTypeSelectionProps) => {
     const navigate = useNavigate();
 

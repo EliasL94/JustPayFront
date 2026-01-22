@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 
 interface BeneficiaryCardProps {
     id: number;
@@ -8,7 +7,7 @@ interface BeneficiaryCardProps {
     onDelete?: () => void;
 }
 
-const BeneficiaryCard = ({ id, name, iban, account_number, onDelete }: BeneficiaryCardProps) => {
+const BeneficiaryCard = ({ id: _id, name, iban, account_number, onDelete }: BeneficiaryCardProps) => {
     return (
         <div className="self-stretch p-6 bg-white rounded-2xl inline-flex flex-col justify-start items-start gap-4 overflow-hidden border border-gray-100 shadow-sm">
             <div className="self-stretch inline-flex justify-start items-start gap-4">

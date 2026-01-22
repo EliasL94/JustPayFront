@@ -3,9 +3,10 @@ import TransactionsHeader from '../components/transactions/TransactionsHeader';
 import TransactionsList from '../components/transactions/TransactionsList';
 import TransactionsStats from '../components/transactions/TransactionsStats';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const Transactions = () => {
+    // États pour gérer les filtres, les données et le chargement
     const [accounts, setAccounts] = useState<any[]>([]);
     const [transactions, setTransactions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -14,21 +15,26 @@ const Transactions = () => {
 
     const [beneficiaries, setBeneficiaries] = useState<any[]>([]);
 
+    // Récupération initiale des comptes et des bénéficiaires
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchInitialData = async () => {
             const userId = localStorage.getItem('user_id');
             if (!userId) return;
 
             try {
 
                 let allAccounts: any[] = [];
-                const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`);
+                const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (primaryResponse.ok) {
                     const primaryData = await primaryResponse.json();
                     if (primaryData) allAccounts.push({ ...primaryData, type: 'primary' });
                 }
 
-                const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`);
+                const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (secondaryResponse.ok) {
                     const secondaryData = await secondaryResponse.json();
                     if (Array.isArray(secondaryData)) {
@@ -39,7 +45,9 @@ const Transactions = () => {
                 }
                 setAccounts(allAccounts);
 
-                const benResponse = await fetch(`${API_BASE_URL}/beneficiaries/user/${userId}`);
+                const benResponse = await fetch(`${API_BASE_URL}/beneficiaries/user/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (benResponse.ok) {
                     const benData = await benResponse.json();
                     setBeneficiaries(Array.isArray(benData) ? benData : []);
@@ -50,9 +58,10 @@ const Transactions = () => {
             }
         };
 
-        fetchData();
+        fetchInitialData();
     }, []);
 
+    // Récupération des transactions quand les comptes sont chargés ou quand le compte sélectionné change
     useEffect(() => {
         const fetchTransactions = async () => {
             setLoading(true);
@@ -66,7 +75,9 @@ const Transactions = () => {
                 let allTransactions: any[] = [];
 
                 if (selectedAccount) {
-                    const txResponse = await fetch(`${API_BASE_URL}/payments/account/${selectedAccount.account_number}`);
+                    const txResponse = await fetch(`${API_BASE_URL}/payments/account/${selectedAccount.account_number}`, {
+                        headers: { 'ngrok-skip-browser-warning': 'true' }
+                    });
                     if (txResponse.ok) {
                         const txData = await txResponse.json();
                         if (Array.isArray(txData)) {
@@ -76,7 +87,9 @@ const Transactions = () => {
                 } else {
                     for (const account of accounts) {
                         if (account?.account_number) {
-                            const txResponse = await fetch(`${API_BASE_URL}/payments/account/${account.account_number}`);
+                            const txResponse = await fetch(`${API_BASE_URL}/payments/account/${account.account_number}`, {
+                                headers: { 'ngrok-skip-browser-warning': 'true' }
+                            });
                             if (txResponse.ok) {
                                 const txData = await txResponse.json();
                                 if (Array.isArray(txData)) {

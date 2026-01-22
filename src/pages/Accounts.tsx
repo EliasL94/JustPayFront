@@ -12,6 +12,7 @@ const Accounts = () => {
     const [selectedAccountToClose, setSelectedAccountToClose] = useState<any>(null);
     const [userDetails, setUserDetails] = useState<any>(null);
 
+    // Récupération des comptes (principal et secondaires)
     const fetchAccounts = useCallback(async () => {
         const userId = localStorage.getItem('user_id');
         if (!userId) {
@@ -23,7 +24,9 @@ const Accounts = () => {
             let allAccounts: any[] = [];
 
             // Fetch primary account
-            const primaryResponse = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/primary/${userId}`);
+            const primaryResponse = await fetch(`${import.meta.env.VITE_API_URL}/bankaccount/accounts/primary/${userId}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             if (primaryResponse.ok) {
                 const primaryData = await primaryResponse.json();
                 console.log('Primary account data:', primaryData);
@@ -37,7 +40,9 @@ const Accounts = () => {
             }
 
             // Fetch secondary accounts
-            const secondaryResponse = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/secondary/${userId}`);
+            const secondaryResponse = await fetch(`${import.meta.env.VITE_API_URL}/bankaccount/accounts/secondary/${userId}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             if (secondaryResponse.ok) {
                 const secondaryData = await secondaryResponse.json();
                 console.log('Secondary accounts data:', secondaryData);
@@ -74,14 +79,16 @@ const Accounts = () => {
         }
     }, []);
 
+    // Récupération des détails de l'utilisateur
     const fetchUserDetails = useCallback(async () => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/auth/me', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'ngrok-skip-browser-warning': 'true'
                 }
             });
             if (response.ok) {
@@ -98,12 +105,14 @@ const Accounts = () => {
         fetchUserDetails();
     }, [fetchAccounts, fetchUserDetails]);
 
+    // Suppression d'un compte
     const handleDeleteAccount = async () => {
         if (!selectedAccountToClose || !selectedAccountToClose.account_number) return;
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/${selectedAccountToClose.account_number}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/bankaccount/accounts/${selectedAccountToClose.account_number}`, {
                 method: 'DELETE',
+                headers: { 'ngrok-skip-browser-warning': 'true' }
             });
 
             if (response.ok) {
@@ -119,6 +128,7 @@ const Accounts = () => {
         }
     };
 
+    // Création d'un compte secondaire
     const createSecondaryAccount = async (accountName: string) => {
         if (!userDetails) {
             console.error('User details not available');
@@ -134,10 +144,11 @@ const Accounts = () => {
         });
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/secondary?${params.toString()}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/bankaccount/accounts/secondary?${params.toString()}`, {
                 method: 'POST',
                 headers: {
-                    'accept': 'application/json'
+                    'accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
                 }
             });
 

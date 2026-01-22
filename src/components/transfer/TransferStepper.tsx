@@ -1,4 +1,9 @@
-const TransferStepper = () => {
+// COMPOSANT ÉTAPES VIREMENT : Affiche la barre de progression (1. Type -> 2. Bénéficiaire -> 3. Confirmation)
+interface TransferStepperProps {
+    currentStep: number;
+}
+
+const TransferStepper = ({ currentStep: _currentStep }: TransferStepperProps) => {
     return (
         <div className="inline-flex justify-start items-center gap-4">
             <div className="flex justify-start items-center gap-6">

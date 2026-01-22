@@ -3,7 +3,7 @@ import IconDownload from '../../assets/SVG_Dashboard/Icon-3.svg';
 import IconChevronDown from '../../assets/SVG_Dashboard/icon-chevron-up.svg';
 import jsPDF from 'jspdf';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 interface TransactionsHeaderProps {
     accounts?: any[];
@@ -24,7 +24,7 @@ const TransactionsHeader = ({
     const [showAccountDropdown, setShowAccountDropdown] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
 
-    // Generate month options for the past 12 months
+
     const generateMonthOptions = () => {
         const months = [
             'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -55,12 +55,11 @@ const TransactionsHeader = ({
         }
 
         try {
-            // Fetch all accounts if not provided or just use what we have?
-            // For the PDF, we usually want a full statement.
-            // Let's keep the existing logic for now to ensure it works independently of the view filter
             let allAccounts: any[] = [];
 
-            const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`);
+            const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             if (primaryResponse.ok) {
                 const primaryData = await primaryResponse.json();
                 if (primaryData) {
@@ -68,7 +67,9 @@ const TransactionsHeader = ({
                 }
             }
 
-            const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`);
+            const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             if (secondaryResponse.ok) {
                 const secondaryData = await secondaryResponse.json();
                 if (Array.isArray(secondaryData)) {
@@ -78,11 +79,13 @@ const TransactionsHeader = ({
                 }
             }
 
-            // Fetch transactions for all accounts
+
             let allTransactions: any[] = [];
             for (const account of allAccounts) {
                 if (account?.account_number) {
-                    const txResponse = await fetch(`${API_BASE_URL}/payments/account/${account.account_number}`);
+                    const txResponse = await fetch(`${API_BASE_URL}/payments/account/${account.account_number}`, {
+                        headers: { 'ngrok-skip-browser-warning': 'true' }
+                    });
                     if (txResponse.ok) {
                         const txData = await txResponse.json();
                         if (Array.isArray(txData)) {
@@ -92,10 +95,10 @@ const TransactionsHeader = ({
                 }
             }
 
-            // Generate PDF
+
             const pdf = new jsPDF();
 
-            // Header
+
             pdf.setFontSize(20);
             pdf.text('Relevé de Compte', 105, 20, { align: 'center' });
 
@@ -103,7 +106,7 @@ const TransactionsHeader = ({
             pdf.text(`Période: ${selectedMonth}`, 105, 30, { align: 'center' });
             pdf.text(`Date d'édition: ${new Date().toLocaleDateString('fr-FR')}`, 105, 38, { align: 'center' });
 
-            // Accounts summary
+
             let yPosition = 50;
             pdf.setFontSize(14);
             pdf.text('Comptes:', 20, yPosition);
@@ -117,7 +120,7 @@ const TransactionsHeader = ({
 
             yPosition += 10;
 
-            // Transactions
+
             pdf.setFontSize(14);
             pdf.text('Transactions:', 20, yPosition);
             yPosition += 8;
@@ -127,7 +130,7 @@ const TransactionsHeader = ({
             if (allTransactions.length === 0) {
                 pdf.text('Aucune transaction pour cette période', 20, yPosition);
             } else {
-                allTransactions.forEach((tx, index) => {
+                allTransactions.forEach((tx) => {
                     if (yPosition > 270) {
                         pdf.addPage();
                         yPosition = 20;
@@ -142,7 +145,7 @@ const TransactionsHeader = ({
                 });
             }
 
-            // Download
+
             pdf.save(`releve-${selectedMonth.replace(' ', '-')}.pdf`);
 
         } catch (error) {
@@ -160,7 +163,7 @@ const TransactionsHeader = ({
                 <div className="justify-start text-neutral-400 text-lg font-normal font-['Inter'] leading-7">Gérer tout l'historique de vos transactions</div>
             </div>
             <div className="flex justify-start items-center gap-2.5">
-                {/* Account Filter */}
+
                 <div className="w-56 inline-flex flex-col justify-start items-start relative">
                     <div className="self-stretch flex flex-col justify-start items-start gap-2">
                         <div className="self-stretch bg-white rounded-md outline outline-2 outline-offset-[-2px] outline-slate-300 flex flex-col justify-start items-start overflow-hidden">
@@ -177,7 +180,7 @@ const TransactionsHeader = ({
                             </div>
                         </div>
                     </div>
-                    {/* Account Dropdown */}
+
                     {showAccountDropdown && (
                         <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-10 max-h-60 overflow-y-auto border border-slate-300">
                             <div
@@ -205,7 +208,7 @@ const TransactionsHeader = ({
                     )}
                 </div>
 
-                {/* Date Filter */}
+
                 <div className="w-48 inline-flex flex-col justify-start items-start relative">
                     <div className="self-stretch flex flex-col justify-start items-start gap-2">
                         <div className="self-stretch bg-white rounded-md outline outline-2 outline-offset-[-2px] outline-slate-300 flex flex-col justify-start items-start overflow-hidden">
@@ -221,7 +224,7 @@ const TransactionsHeader = ({
                         </div>
                     </div>
 
-                    {/* Dropdown */}
+
                     {showMonthDropdown && (
                         <div className="absolute top-full mt-1 w-full bg-white rounded-md shadow-lg z-10 max-h-60 overflow-y-auto border border-slate-300">
                             {monthOptions.map((month) => (
@@ -240,7 +243,7 @@ const TransactionsHeader = ({
                     )}
                 </div>
 
-                {/* Download Button */}
+
                 <div
                     className={`px-6 py-4 rounded-md outline outline-2 outline-offset-[-2px] outline-emerald-950 flex justify-center items-center gap-2 overflow-hidden cursor-pointer hover:bg-emerald-50 transition-colors ${isDownloading ? 'opacity-50' : ''}`}
                     onClick={handleDownloadStatement}

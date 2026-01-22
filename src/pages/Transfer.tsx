@@ -7,8 +7,10 @@ import InternalTransferForm from '../components/transfer/InternalTransferForm';
 import ExternalTransferForm from '../components/transfer/ExternalTransferForm';
 import InternalTransferSuccess from '../components/transfer/InternalTransferSuccess';
 
+// PAGE VIREMENTS : Cette page gère tout le processus de virement. Elle permet de choisir entre un virement interne ou externe, et affiche le formulaire correspondant ou le message de succès.
 const Transfer = () => {
     const location = useLocation();
+    // Gestion de l'état du virement (choix du type, formulaire interne/externe, succès)
     const [transferType, setTransferType] = useState<'selection' | 'internal' | 'external' | 'internal_success'>(
         (location.state?.initialType as 'selection' | 'internal' | 'external' | 'internal_success') || 'selection'
     );
@@ -22,15 +24,19 @@ const Transfer = () => {
         }
     }, [location.state, transferType]);
 
+    // Chargement des comptes et des bénéficiaires au démarrage
     useEffect(() => {
         const fetchData = async () => {
             const userId = localStorage.getItem('user_id');
             if (!userId) return;
 
             try {
-                // Fetch Accounts
-                const primaryRes = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/primary/${userId}`);
-                const secondaryRes = await fetch(`http://127.0.0.1:8000/bankaccount/accounts/secondary/${userId}`);
+                const primaryRes = await fetch(`${import.meta.env.VITE_API_URL}/bankaccount/accounts/primary/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                const secondaryRes = await fetch(`${import.meta.env.VITE_API_URL}/bankaccount/accounts/secondary/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
 
                 let allAccounts: any[] = [];
 
@@ -49,8 +55,10 @@ const Transfer = () => {
                 }
                 setAccounts(allAccounts);
 
-                // Fetch Beneficiaries
-                const benRes = await fetch(`http://127.0.0.1:8000/beneficiaries/user/${userId}`);
+
+                const benRes = await fetch(`${import.meta.env.VITE_API_URL}/beneficiaries/user/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (benRes.ok) {
                     const benData = await benRes.json();
                     setBeneficiaries(Array.isArray(benData) ? benData : []);
@@ -73,20 +81,21 @@ const Transfer = () => {
         setTransferType('internal_success');
     };
 
+    // Génération du reçu PDF après un virement réussi
     const handleDownloadReceipt = () => {
         if (!successData) return;
 
         const doc = new jsPDF();
 
-        // Title
+
         doc.setFontSize(22);
         doc.text('Reçu de Virement', 105, 20, { align: 'center' });
 
-        // Date
+
         doc.setFontSize(12);
         doc.text(`Date: ${new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`, 105, 30, { align: 'center' });
 
-        // Details
+
         doc.setFontSize(14);
         doc.text('Détails de la transaction:', 20, 50);
 
@@ -95,7 +104,7 @@ const Transfer = () => {
         doc.text(`Bénéficiaire: ${successData.recipient}`, 20, 70);
         doc.text(`Statut: Succès`, 20, 80);
 
-        // Footer
+
         doc.setFontSize(10);
         doc.text('Ce document est un justificatif de transaction généré automatiquement.', 105, 100, { align: 'center' });
 
@@ -107,7 +116,7 @@ const Transfer = () => {
             <div className="flex-1 self-stretch px-4 md:px-6 py-12 inline-flex flex-col justify-start items-center gap-12">
                 {transferType === 'selection' && (
                     <>
-                        <TransferStepper />
+                        <TransferStepper currentStep={1} />
                         <TransferTypeSelection onSelect={handleTypeSelect} />
                     </>
                 )}

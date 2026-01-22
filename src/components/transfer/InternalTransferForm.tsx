@@ -6,17 +6,17 @@ interface InternalTransferFormProps {
     accounts: any[];
 }
 
+// COMPOSANT VIREMENT INTERNE : Formulaire pour virer de l'argent entre mes propres comptes. Il vérifie le solde avant d'envoyer la demande.
 const InternalTransferForm = ({ onBack, onSuccess, accounts }: InternalTransferFormProps) => {
     const [amount, setAmount] = useState('');
     const [label, setLabel] = useState('');
     const [selectedDebitAccount, setSelectedDebitAccount] = useState<string>('');
     const [selectedCreditAccount, setSelectedCreditAccount] = useState<string>('');
 
+    // Initialisation des comptes par défaut (débit = 1er compte, crédit = 2ème compte)
     useEffect(() => {
         if (accounts.length > 0) {
-
             setSelectedDebitAccount(accounts[0].account_number);
-
             if (accounts.length > 1) {
                 setSelectedCreditAccount(accounts[1].account_number);
             } else {
@@ -25,18 +25,31 @@ const InternalTransferForm = ({ onBack, onSuccess, accounts }: InternalTransferF
         }
     }, [accounts]);
 
+    // Gestion de la soumission du virement
     const handleSubmit = async () => {
         const userId = localStorage.getItem('user_id');
         if (!userId || !selectedDebitAccount || !selectedCreditAccount || !amount) {
             alert("Veuillez remplir tous les champs obligatoires.");
             return;
         }
+        const debitAccount = accounts.find(acc => acc.account_number === selectedDebitAccount);
+        if (debitAccount) {
+            const balance = typeof debitAccount.balance === 'string'
+                ? parseFloat(debitAccount.balance.replace(',', '.').replace('€', ''))
+                : debitAccount.balance;
+
+            if (parseFloat(amount) > balance) {
+                alert("Solde insuffisant pour effectuer ce virement.");
+                return;
+            }
+        }
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/payments/transfer?user_id=${userId}&account_number=${selectedDebitAccount}&beneficiary_account_number=${selectedCreditAccount}&amount=${Math.round(Number(amount) * 100)}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/transfer?user_id=${userId}&account_number=${selectedDebitAccount}&beneficiary_account_number=${selectedCreditAccount}&amount=${Math.round(Number(amount) * 100)}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
                 }
             });
 
@@ -60,8 +73,7 @@ const InternalTransferForm = ({ onBack, onSuccess, accounts }: InternalTransferF
         return acc.name || "Compte secondaire";
     };
 
-    const selectedDebitAcc = accounts.find(acc => acc.account_number === selectedDebitAccount);
-    const selectedCreditAcc = accounts.find(acc => acc.account_number === selectedCreditAccount);
+
 
     return (
         <div className="self-stretch self-stretch px-6 py-12 inline-flex flex-col justify-start items-center gap-12">

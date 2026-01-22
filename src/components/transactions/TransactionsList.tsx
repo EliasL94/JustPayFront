@@ -7,38 +7,32 @@ interface TransactionsListProps {
 
 const TransactionsList = ({ transactions = [], loading = false, accounts = [], beneficiaries = [] }: TransactionsListProps) => {
 
+    // Fonction pour déterminer le nom à afficher (bénéficiaire, compte interne ou autre)
     const getTransactionName = (tx: any) => {
-        // If we have a direct beneficiary name, use it (unless it's "Inconnu" or empty)
         if (tx.beneficiary && tx.beneficiary !== 'Inconnu') return tx.beneficiary;
 
-        // Determine the "other" account number
         let otherAccountNumber = '';
         if (tx.amount > 0) {
-            // Expense: Money went to beneficiary_account_number
             otherAccountNumber = tx.beneficiary_account_number;
         } else {
-            // Income: Money came from account_number
             otherAccountNumber = tx.account_number;
         }
 
         if (!otherAccountNumber) return tx.label || tx.description || 'Inconnu';
 
-        // 1. Check in Beneficiaries (External)
         const beneficiary = beneficiaries.find(b => b.account_number === otherAccountNumber);
         if (beneficiary) return beneficiary.name;
 
-        // 2. Check in My Accounts (Internal Transfer)
         const account = accounts.find(a => a.account_number === otherAccountNumber);
         if (account) {
-            // It's one of my accounts. Return its name or "Compte [Type]"
             return account.name || (account.type === 'primary' ? 'Compte Principal' : 'Compte Secondaire');
         }
 
-        // 3. Fallback
+
         return tx.label || tx.description || 'Inconnu';
     };
 
-    // Group transactions by date
+    // Regroupement des transactions par date pour l'affichage
     const groupedTransactions = transactions.reduce((groups: any, transaction: any) => {
         const date = transaction.date || transaction.created_at || 'En cours';
         if (!groups[date]) {
@@ -50,7 +44,7 @@ const TransactionsList = ({ transactions = [], loading = false, accounts = [], b
 
     return (
         <div style={{ width: '914px', paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, background: 'white', overflow: 'hidden', borderRadius: 16, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 32, display: 'inline-flex' }}>
-            {/* Tabs */}
+
             <div style={{ alignSelf: 'stretch', borderBottom: '2px #CBD2E0 solid', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex' }}>
                 <div style={{ alignSelf: 'stretch', paddingTop: 12, paddingBottom: 12, borderBottom: '2px #002222 solid', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex' }}>
                     <div style={{ width: 16, height: 16, position: 'relative', overflow: 'hidden' }}>
@@ -138,7 +132,7 @@ const TransactionsList = ({ transactions = [], loading = false, accounts = [], b
                         </div>
                     ))}
 
-                    {/* Pagination */}
+
                     <div style={{ justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex' }}>
                         <div style={{ alignSelf: 'stretch', paddingLeft: 20, paddingRight: 20, background: '#E4F6F5', borderRadius: 5, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer' }}>
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

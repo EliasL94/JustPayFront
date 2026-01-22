@@ -3,13 +3,14 @@ import BeneficiariesHeader from '../components/beneficiaries/BeneficiariesHeader
 import BeneficiaryCard from '../components/beneficiaries/BeneficiaryCard';
 import AddBeneficiaryModal from '../components/beneficiaries/AddBeneficiaryModal';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const Beneficiaries = () => {
     const [beneficiaries, setBeneficiaries] = useState<any[]>([]);
     const [totalAssets, setTotalAssets] = useState<string>('0,00');
 
 
+    // Récupération des bénéficiaires et des comptes au chargement
     useEffect(() => {
         const fetchBeneficiaries = async () => {
             const userId = localStorage.getItem('user_id');
@@ -19,7 +20,9 @@ const Beneficiaries = () => {
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/beneficiaries/user/${userId}`);
+                const response = await fetch(`${API_BASE_URL}/beneficiaries/user/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setBeneficiaries(data);
@@ -39,7 +42,9 @@ const Beneficiaries = () => {
                 let allAccounts: any[] = [];
 
                 // Fetch primary account
-                const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`);
+                const primaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/primary/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (primaryResponse.ok) {
                     const primaryData = await primaryResponse.json();
                     if (primaryData) {
@@ -48,7 +53,9 @@ const Beneficiaries = () => {
                 }
 
                 // Fetch secondary accounts
-                const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`);
+                const secondaryResponse = await fetch(`${API_BASE_URL}/bankaccount/accounts/secondary/${userId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (secondaryResponse.ok) {
                     const secondaryData = await secondaryResponse.json();
                     if (Array.isArray(secondaryData)) {
@@ -79,6 +86,7 @@ const Beneficiaries = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Ajout d'un nouveau bénéficiaire
     const handleAddBeneficiary = async (name: string, accountNumber: string) => {
         const userId = localStorage.getItem('user_id');
         if (!userId) {
@@ -98,6 +106,7 @@ const Beneficiaries = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
                 },
             });
 
@@ -112,6 +121,7 @@ const Beneficiaries = () => {
             // Ignore error
         }
     };
+    // Suppression d'un bénéficiaire
     const handleDeleteBeneficiary = async (id: number) => {
         if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce bénéficiaire ?')) {
             return;
@@ -120,6 +130,7 @@ const Beneficiaries = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/beneficiaries/${id}`, {
                 method: 'DELETE',
+                headers: { 'ngrok-skip-browser-warning': 'true' }
             });
 
             if (response.ok) {

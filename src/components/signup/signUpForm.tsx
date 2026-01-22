@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoFinvo from '../../assets/jira_ops.svg';
-import './signupForm.css';
+import './signUpForm.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
